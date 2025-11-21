@@ -131,8 +131,6 @@ scene("leaderboard", ({ username }) => {
 });
 
 scene("game", ({ username }) => {
-  let pause = false;
-
   // Game objects
   const player = add([sprite("player"), pos(80, height() / 2), area(), body()]);
 
@@ -155,6 +153,31 @@ scene("game", ({ username }) => {
     hexToRgb("#2e222f"),
   ]);
 
+  // Pause menu
+  let pause = false;
+  const pauseFunction = () => {
+    pause = !pause;
+    continueBtn.hidden = !pause;
+    exitBtn.hidden = !pause;
+  };
+
+  const continueBtn = addButton(
+    "Continue",
+    vec2(width() / 2, height() / 2 - 64),
+    pauseFunction
+  );
+
+  const exitBtn = addButton(
+    "Exit",
+    vec2(width() / 2, height() / 2 + 32),
+    () => {
+      go("menu", { username: username });
+    }
+  );
+
+  continueBtn.hidden = !pause;
+  exitBtn.hidden = !pause;
+
   // Update
   player.onUpdate(() => {
     if (!pause) {
@@ -169,9 +192,7 @@ scene("game", ({ username }) => {
     }
   });
 
-  onKeyPress("escape", () => {
-    pause = !pause;
-  });
+  onKeyPress("escape", pauseFunction);
 });
 
 scene("lose", ({ username }) => {});
