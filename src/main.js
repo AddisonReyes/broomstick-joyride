@@ -129,6 +129,26 @@ scene("leaderboard", ({ username }) => {
 scene("game", ({ username }) => {
   // Game objects
   const player = add([sprite("player"), pos(80, height() / 2), area(), body()]);
+  let speed = 480;
+  let score = 0;
+
+  function spawnObject() {
+    add([
+      rect(rand(16, 96), rand(32, 96)),
+      area(),
+      outline(4),
+      rotate(rand(0, 180)),
+      pos(width(), rand(0, height())),
+      anchor("botleft"),
+      color(255, 180, 255),
+      move(LEFT, speed),
+      "object",
+    ]);
+
+    wait(rand(0.5, 1.5), spawnObject);
+  }
+
+  spawnObject();
 
   // Borders
   add([
@@ -148,6 +168,9 @@ scene("game", ({ username }) => {
     body({ isStatic: true }),
     hexToRgb("#2e222f"),
   ]);
+
+  // Interface
+  const scoreLabel = add([text(score), pos(24, 24)]);
 
   // Pause menu
   let paused = false;
@@ -188,6 +211,15 @@ scene("game", ({ username }) => {
     }
   });
 
+  player.onCollide("object", () => {
+    go("lose", { username, score });
+  });
+
+  onUpdate(() => {
+    score++;
+    scoreLabel.text = score;
+  });
+
   // Keys
   onKeyDown("space", () => {
     if (!paused) {
@@ -198,10 +230,35 @@ scene("game", ({ username }) => {
   onKeyPress("escape", pauseFunction);
 });
 
-scene("lose", ({ username }) => {});
+scene("lose", ({ username, score }) => {
+  add([
+    sprite("player"),
+    pos(width() / 2, height() / 2 - 160),
+    scale(2),
+    anchor("center"),
+  ]);
+
+  // display score
+  add([
+    text(score || 0),
+    pos(width() / 2, height() / 2 - 32),
+    scale(2),
+    anchor("center"),
+  ]);
+
+  const gameFunction = () => go("game", { username });
+
+  addButton("Play again", vec2(width() / 2, height() / 2 + 64), gameFunction);
+  addButton("Leaderboard", vec2(width() / 2, height() / 2 + 160), () => {
+    go("leaderboard", { username: username });
+  });
+
+  onKeyPress("space", gameFunction);
+  onClick(gameFunction);
+});
 
 function main() {
-  go("game", { username: "Dakotah" });
+  go("lose", { username: "Dakotah" });
 }
 
 main();
