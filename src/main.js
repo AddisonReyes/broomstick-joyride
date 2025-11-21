@@ -15,11 +15,7 @@ loadSprite("player", "sprites/bean.png");
 loadFont("alagard", "fonts/alagard.ttf", { filter: "nearest" });
 
 // Utils
-function addButton(
-  label = "text",
-  position = vec2(200, 100),
-  f = () => debug.log("click")
-) {
+function addButton(label = "text", position = vec2(200, 100), f = () => {}) {
   const btn = add([
     rect(240, 80, { radius: 6 }),
     pos(position),
@@ -154,40 +150,47 @@ scene("game", ({ username }) => {
   ]);
 
   // Pause menu
-  let pause = false;
+  let paused = false;
   const pauseFunction = () => {
-    pause = !pause;
-    continueBtn.hidden = !pause;
-    exitBtn.hidden = !pause;
+    paused = !paused;
+    continueBtn.hidden = !paused;
+    exitBtn.hidden = !paused;
   };
 
   const continueBtn = addButton(
     "Continue",
-    vec2(width() / 2, height() / 2 - 64),
-    pauseFunction
+    vec2(width() / 2, height() / 2 - 64)
   );
 
   const exitBtn = addButton(
     "Exit",
     vec2(width() / 2, height() / 2 + 32),
     () => {
-      go("menu", { username: username });
+      if (paused) {
+        go("menu", { username: username });
+      }
     }
   );
 
-  continueBtn.hidden = !pause;
-  exitBtn.hidden = !pause;
+  continueBtn.hidden = !paused;
+  exitBtn.hidden = !paused;
+
+  continueBtn.onClick(() => {
+    if (!continueBtn.hidden) {
+      pauseFunction();
+    }
+  });
 
   // Update
   player.onUpdate(() => {
-    if (!pause) {
+    if (!paused) {
       player.pos.y += 3;
     }
   });
 
   // Keys
   onKeyDown("space", () => {
-    if (!pause) {
+    if (!paused) {
       player.pos.y -= 6;
     }
   });
