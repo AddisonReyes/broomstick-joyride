@@ -3,16 +3,14 @@ import "kaplay/global";
 
 // Start game
 kaplay({
+  background: hexToRgb("#625565", true),
   font: "alagard",
-  background: [46, 34, 47],
 });
-
-// Constants variables
 
 // Load Assets
 loadRoot("./");
 
-loadSprite("bean", "sprites/bean.png");
+loadSprite("player", "sprites/bean.png");
 
 loadFont("alagard", "fonts/alagard.ttf", { filter: "nearest" });
 
@@ -49,6 +47,31 @@ function addButton(
   btn.onClick(f);
 
   return btn;
+}
+
+function hexToRgb(hex, returnList = false) {
+  let cleanHex = hex.replace(/^#/, "");
+
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex
+      .split("")
+      .map((char) => char + char)
+      .join("");
+  }
+
+  if (cleanHex.length !== 6) {
+    return null;
+  }
+
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+
+  if (returnList) {
+    return [r, g, b];
+  }
+
+  return color(r, g, b);
 }
 
 // Game scenes
@@ -90,7 +113,6 @@ scene("user", ({ username }) => {
 });
 
 scene("menu", ({ username }) => {
-  debug.log(username);
   addButton("Play", vec2(width() / 2, height() / 2 - 64), () => {
     go("game", { username: username });
   });
@@ -102,18 +124,60 @@ scene("menu", ({ username }) => {
   });
 });
 
-scene("game", ({ username }) => {});
-
-scene("lose", ({ username }) => {});
-
 scene("leaderboard", ({ username }) => {
   addButton("Back", vec2(width() / 2, height() / 2 - 64), () => {
     go("menu", { username: username });
   });
 });
 
+scene("game", ({ username }) => {
+  let pause = false;
+
+  // Game objects
+  const player = add([sprite("player"), pos(80, height() / 2), area(), body()]);
+
+  // Borders
+  add([
+    rect(width(), 48),
+    pos(0, 0),
+    outline(4),
+    area(),
+    body({ isStatic: true }),
+    hexToRgb("#2e222f"),
+  ]);
+
+  add([
+    rect(width(), 48),
+    pos(0, height() - 48),
+    outline(4),
+    area(),
+    body({ isStatic: true }),
+    hexToRgb("#2e222f"),
+  ]);
+
+  // Update
+  player.onUpdate(() => {
+    if (!pause) {
+      player.pos.y += 3;
+    }
+  });
+
+  // Keys
+  onKeyDown("space", () => {
+    if (!pause) {
+      player.pos.y -= 6;
+    }
+  });
+
+  onKeyPress("escape", () => {
+    pause = !pause;
+  });
+});
+
+scene("lose", ({ username }) => {});
+
 function main() {
-  go("menu", { username: "Dakotah" });
+  go("game", { username: "Dakotah" });
 }
 
 main();
