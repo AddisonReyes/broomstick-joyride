@@ -14,6 +14,73 @@ loadSprite("player", "sprites/bean.png");
 
 loadFont("alagard", "fonts/alagard.ttf", { filter: "nearest" });
 
+const hexColorList = [
+  "#2e222f",
+  "#3e3546",
+  "#625565",
+  "#966c6c",
+  "#ab947a",
+  "#694f62",
+  "#7f708a",
+  "#9babb2",
+  "#c7dcd0",
+  "#ffffff",
+  "#6e2727",
+  "#b33831",
+  "#ea4f36",
+  "#f57d4a",
+  "#ae2334",
+  "#e83b3b",
+  "#fb6b1d",
+  "#f79617",
+  "#f9c22b",
+  "#7a3045",
+  "#9e4539",
+  "#cd683d",
+  "#e6904e",
+  "#fbb954",
+  "#4c3e24",
+  "#676633",
+  "#a2a947",
+  "#d5e04b",
+  "#fbff86",
+  "#165a4c",
+  "#239063",
+  "#1ebc73",
+  "#91db69",
+  "#cddf6c",
+  "#313638",
+  "#374e4a",
+  "#547e64",
+  "#92a984",
+  "#b2ba90",
+  "#0b5e65",
+  "#0b8a8f",
+  "#0eaf9b",
+  "#30e1b9",
+  "#8ff8e2",
+  "#323353",
+  "#484a77",
+  "#4d65b4",
+  "#4d9be6",
+  "#8fd3ff",
+  "#45293f",
+  "#6b3e75",
+  "#905ea9",
+  "#a884f3",
+  "#eaaded",
+  "#753c54",
+  "#a24b6f",
+  "#cf657f",
+  "#ed8099",
+  "#831c5d",
+  "#c32454",
+  "#f04f78",
+  "#f68181",
+  "#fca790",
+  "#fdcbb0",
+];
+
 // Utils
 function addButton(label = "text", position = vec2(200, 100), f = () => {}) {
   const btn = add([
@@ -134,21 +201,17 @@ scene("game", ({ username }) => {
 
   function spawnObject() {
     add([
-      rect(rand(16, 96), rand(32, 96)),
+      rect(rand(16, 128), rand(32, 128)),
       area(),
       outline(4),
       rotate(rand(0, 180)),
-      pos(width(), rand(0, height())),
+      pos(width() + 200, rand(64, height() - 64)),
       anchor("botleft"),
-      color(255, 180, 255),
-      move(LEFT, speed),
+      hexToRgb(choose(hexColorList)),
+      z(-1),
       "object",
     ]);
-
-    wait(rand(0.5, 1.5), spawnObject);
   }
-
-  spawnObject();
 
   // Borders
   add([
@@ -215,9 +278,33 @@ scene("game", ({ username }) => {
     go("lose", { username, score });
   });
 
+  onUpdate("object", (obj) => {
+    if (!paused) {
+      obj.pos.x -= speed * dt();
+    }
+
+    if (obj.pos.x < -100) {
+      obj.destroy();
+    }
+  });
+
+  let elapsedTime = 0;
   onUpdate(() => {
-    score++;
-    scoreLabel.text = score;
+    if (!paused) {
+      elapsedTime += dt();
+
+      score += 1;
+      scoreLabel.text = score;
+
+      if (elapsedTime <= 1) return;
+      spawnObject();
+      if (rand(0, 1) <= 0.5) {
+        spawnObject();
+      }
+
+      elapsedTime -= 1;
+      speed += 6;
+    }
   });
 
   // Keys
@@ -249,8 +336,13 @@ scene("lose", ({ username, score }) => {
   const gameFunction = () => go("game", { username });
 
   addButton("Play again", vec2(width() / 2, height() / 2 + 64), gameFunction);
+
   addButton("Leaderboard", vec2(width() / 2, height() / 2 + 160), () => {
     go("leaderboard", { username: username });
+  });
+
+  addButton("Main menu", vec2(width() / 2, height() / 2 + 256), () => {
+    go("menu", { username: username });
   });
 
   onKeyPress("space", gameFunction);
@@ -258,7 +350,7 @@ scene("lose", ({ username, score }) => {
 });
 
 function main() {
-  go("lose", { username: "Dakotah" });
+  go("game", { username: "Dakotah" });
 }
 
 main();
