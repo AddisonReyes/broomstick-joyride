@@ -82,7 +82,12 @@ const hexColorList = [
 ];
 
 // Utils
-function addButton(label = "text", position = vec2(200, 100), f = () => {}) {
+function addButton(
+  buttonLabel = "text",
+  position = vec2(200, 100),
+  f = () => {},
+  descriptionLabel = ""
+) {
   const btn = add([
     rect(240, 80, { radius: 6 }),
     pos(position),
@@ -93,16 +98,26 @@ function addButton(label = "text", position = vec2(200, 100), f = () => {}) {
     color(255, 255, 255),
   ]);
 
-  btn.add([text(label), anchor("center"), color(0, 0, 0)]);
+  const description = add([
+    text(descriptionLabel),
+    pos(btn.pos.x + 160, btn.pos.y),
+    anchor("left"),
+  ]);
+  description.hidden = true;
+
+  btn.add([text(buttonLabel), anchor("center"), color(0, 0, 0)]);
 
   btn.onHoverUpdate(() => {
     const t = time() * 10;
     btn.color = hsl2rgb((t / 10) % 1, 0.6, 0.7);
     btn.scale = vec2(1.1);
     setCursor("pointer");
+
+    if (descriptionLabel) description.hidden = false;
   });
 
   btn.onHoverEnd(() => {
+    if (descriptionLabel) description.hidden = true;
     btn.scale = vec2(1);
     btn.color = rgb();
   });
@@ -146,7 +161,7 @@ scene("user", ({ username }) => {
   ]);
 
   const usernameInput = add([
-    text(username),
+    text(username.trim()),
     textInput(true, 16),
     pos(width() / 2, height() / 2),
     anchor("center"),
@@ -159,6 +174,7 @@ scene("user", ({ username }) => {
   ]);
 
   usernameInput.onUpdate(() => {
+    usernameInput.text = usernameInput.text.trim();
     if (usernameInput.text === "") {
       enterLabel.text = ". . .";
       titleLabel.text = "Type your username";
@@ -176,15 +192,30 @@ scene("user", ({ username }) => {
 });
 
 scene("menu", ({ username }) => {
-  addButton("Play", vec2(width() / 2, height() / 2 - 64), () => {
-    go("game", { username: username });
-  });
-  addButton("User", vec2(width() / 2, height() / 2 + 32), () => {
-    go("user", { username: username });
-  });
-  addButton("Leaderboard", vec2(width() / 2, height() / 2 + 128), () => {
-    go("leaderboard", { username: username });
-  });
+  const playBtn = addButton(
+    "Play",
+    vec2(width() / 2 - 128, height() / 2 - 64),
+    () => {
+      go("game", { username: username });
+    }
+  );
+
+  const userBtn = addButton(
+    "User",
+    vec2(width() / 2 - 128, height() / 2 + 32),
+    () => {
+      go("user", { username: username });
+    },
+    username
+  );
+
+  const leaderboardBtn = addButton(
+    "Leaderboard",
+    vec2(width() / 2 - 128, height() / 2 + 128),
+    () => {
+      go("leaderboard", { username: username });
+    }
+  );
 });
 
 scene("leaderboard", ({ username }) => {
@@ -349,7 +380,7 @@ scene("lose", ({ username, score }) => {
 });
 
 function main() {
-  go("game", { username: "Dakotah" });
+  go("menu", { username: "Dakotah" });
 }
 
 main();
