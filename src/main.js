@@ -346,7 +346,6 @@ scene("lose", ({ username, score }) => {
   });
 
   onKeyPress("space", gameFunction);
-  onClick(gameFunction);
 });
 
 function main() {
