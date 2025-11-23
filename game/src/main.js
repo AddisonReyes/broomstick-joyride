@@ -1,14 +1,13 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
-// Globals
-const leadervoardAPI = "https://leaderboard-bj.up.railway.app/leaderboard";
-
 // Start game
 kaplay({
   background: hexToRgb("#625565", true),
   font: "alagard",
 });
+
+const debugMode = true;
 
 // Load Assets
 loadRoot("./");
@@ -155,6 +154,49 @@ function hexToRgb(hex, returnList = false) {
   return color(r, g, b);
 }
 
+function convertDistance(distance) {
+  return distance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+const leaderboardAPI = "https://leaderboard-bj.up.railway.app/leaderboard";
+
+async function getEntries() {
+  try {
+    const response = await fetch(leaderboardAPI);
+    const data = await response.json();
+
+    if (debugMode) {
+      debug.log("Status:", response.status);
+      debug.log("Data:", data);
+    }
+
+    return data;
+  } catch (error) {
+    if (debugMode) {
+      debug.error("Error:", error);
+    }
+  }
+}
+
+async function postEntry(username, score) {
+  try {
+    const response = await fetch(leaderboardAPI, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: username, score: score }),
+    });
+
+    const result = await response.json();
+    if (debugMode) {
+      debug.log("Response:", result);
+    }
+  } catch (error) {
+    if (debugMode) {
+      debug.error(error);
+    }
+  }
+}
+
 // Game scenes
 scene("user", ({ username }) => {
   const titleLabel = add([
@@ -222,10 +264,109 @@ scene("menu", ({ username }) => {
 });
 
 scene("leaderboard", ({ username }) => {
-  fetch();
-
-  addButton("Back", vec2(width() / 2, height() / 2 - 64), () => {
+  const backBtn = addButton("Back", vec2(width() / 2, height() - 64), () => {
     go("menu", { username: username });
+  });
+
+  let currentPage = 0;
+  const ITEMS_PER_PAGE = 10;
+  let totalPages = 0;
+  let allUsers = [];
+
+  const { x, y } = { x: width() / 2, y: height() / 3.5 };
+
+  const pageIndicator = add([
+    text("Page 1 / 1"),
+    pos(width() / 2, height() / 4 / 2),
+    anchor("center"),
+  ]);
+
+  function renderPage() {
+    destroyAll("leaderboard-entry");
+
+    const start = currentPage * ITEMS_PER_PAGE;
+    const end = Math.min(start + ITEMS_PER_PAGE, allUsers.length);
+    const pageUsers = allUsers.slice(start, end);
+
+    let posY = y;
+    for (let i = 0; i < pageUsers.length; i++) {
+      const user = pageUsers[i];
+      const globalIndex = start + i + 1;
+
+      add([
+        text(
+          `#${globalIndex} ~ ${user.username} / ${convertDistance(
+            user.score
+          )}m`,
+          {
+            transform:
+              user.username === username
+                ? (idx, ch) => ({
+                    color: hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
+                    pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
+                    scale: wave(1, 1.2, time() * 3 + idx),
+                    angle: wave(-6, 6, time() * 3 + idx),
+                  })
+                : undefined,
+          }
+        ),
+        pos(x, posY),
+        anchor("center"),
+        "leaderboard-entry",
+      ]);
+
+      posY += 40;
+    }
+
+    pageIndicator.text = `Page ${currentPage + 1} / ${totalPages}`;
+  }
+
+  // Cargar datos
+  const entries = getEntries();
+  entries.then((users) => {
+    allUsers = users;
+    totalPages = Math.ceil(allUsers.length / ITEMS_PER_PAGE);
+    renderPage();
+  });
+
+  // Navegación con rueda del mouse
+  onScroll((delta) => {
+    if (delta.y > 0 && currentPage < totalPages - 1) {
+      currentPage++;
+      renderPage();
+    } else if (delta.y < 0 && currentPage > 0) {
+      currentPage--;
+      renderPage();
+    }
+  });
+
+  // Navegación con teclas
+  onKeyPress("right", () => {
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      renderPage();
+    }
+  });
+
+  onKeyPress("left", () => {
+    if (currentPage > 0) {
+      currentPage--;
+      renderPage();
+    }
+  });
+
+  onKeyPress("down", () => {
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      renderPage();
+    }
+  });
+
+  onKeyPress("up", () => {
+    if (currentPage > 0) {
+      currentPage--;
+      renderPage();
+    }
   });
 });
 
@@ -269,7 +410,11 @@ scene("game", ({ username }) => {
   ]);
 
   // Interface
-  const scoreLabel = add([text(score), pos(24, 24)]);
+  const scoreLabel = add([
+    text(`${convertDistance(score)}m`),
+    pos(width() / 2, 32),
+    anchor("center"),
+  ]);
 
   // Pause menu
   let paused = false;
@@ -330,7 +475,7 @@ scene("game", ({ username }) => {
       elapsedTime += dt();
 
       score += 1;
-      scoreLabel.text = score;
+      scoreLabel.text = `${convertDistance(score)}m`;
 
       if (elapsedTime <= 1) return;
       spawnObject();
@@ -363,7 +508,7 @@ scene("lose", ({ username, score }) => {
 
   // display score
   add([
-    text(score || 0),
+    text(`${convertDistance(score)}m` || "0m"),
     pos(width() / 2, height() / 2 - 32),
     scale(2),
     anchor("center"),
@@ -373,19 +518,18 @@ scene("lose", ({ username, score }) => {
 
   addButton("Play again", vec2(width() / 2, height() / 2 + 64), gameFunction);
 
-  addButton("Leaderboard", vec2(width() / 2, height() / 2 + 160), () => {
+  addButton("Submit score", vec2(width() / 2, height() / 2 + 160), () => {
+    postEntry(username, score);
     go("leaderboard", { username: username });
   });
 
   addButton("Main menu", vec2(width() / 2, height() / 2 + 256), () => {
     go("menu", { username: username });
   });
-
-  onKeyPress("space", gameFunction);
 });
 
 function main() {
-  go("menu", { username: "Dakotah" });
+  go("leaderboard", { username: "Dakotah", score: 100 });
 }
 
 main();
