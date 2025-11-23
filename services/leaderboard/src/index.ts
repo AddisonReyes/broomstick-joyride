@@ -42,12 +42,13 @@ app.post("/leaderboard", async (req: Request, res: Response) => {
       if (existingEntry.score < score) {
         existingEntry.score = score;
         await Entry.updateOne({ _id: existingEntry._id }, { score });
+        res.status(201).send(existingEntry);
       }
+    } else {
+      const entry = new Entry({ username, score });
+      await entry.save();
+      res.status(201).send(entry);
     }
-
-    const entry = new Entry({ username, score });
-    await entry.save();
-    res.status(201).send(entry);
   } catch (error) {
     const errorMessage = (error as unknown as Error).message;
     res.status(400).json({

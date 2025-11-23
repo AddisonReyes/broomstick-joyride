@@ -1,6 +1,9 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
+// Globals
+const leadervoardAPI = "https://leaderboard-bj.up.railway.app/leaderboard";
+
 // Start game
 kaplay({
   background: hexToRgb("#625565", true),
@@ -219,6 +222,8 @@ scene("menu", ({ username }) => {
 });
 
 scene("leaderboard", ({ username }) => {
+  fetch();
+
   addButton("Back", vec2(width() / 2, height() / 2 - 64), () => {
     go("menu", { username: username });
   });

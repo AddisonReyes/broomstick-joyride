@@ -36,11 +36,14 @@ app.post("/leaderboard", async (req, res) => {
             if (existingEntry.score < score) {
                 existingEntry.score = score;
                 await Entry.updateOne({ _id: existingEntry._id }, { score });
+                res.status(201).send(existingEntry);
             }
         }
-        const entry = new Entry({ username, score });
-        await entry.save();
-        res.status(201).send(entry);
+        else {
+            const entry = new Entry({ username, score });
+            await entry.save();
+            res.status(201).send(entry);
+        }
     }
     catch (error) {
         const errorMessage = error.message;
