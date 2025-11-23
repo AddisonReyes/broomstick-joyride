@@ -2,6 +2,7 @@ import express from "express";
 import Entry from "./models/entry.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config();
 const app = express();
 const env = process.env.NODE_ENV || "dev";
@@ -12,7 +13,12 @@ if (connectionString) {
     mongoose.connect(connectionString);
     console.log(" - Database conected");
 }
+else {
+    console.error(" + Error connecting database");
+    process.exit();
+}
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 app.use(express.json());
 // Setup routes and views
 app.get("/leaderboard", async (req, res) => {
@@ -55,6 +61,11 @@ app.post("/leaderboard", async (req, res) => {
 });
 // Listen port
 app.listen(port, () => {
-    console.log(`Server running in http://localhost:${port}`);
+    if (env === "dev") {
+        console.log(`Server running in http://localhost:${port}`);
+    }
+    else {
+        console.log(`Server running`);
+    }
 });
 //# sourceMappingURL=index.js.map

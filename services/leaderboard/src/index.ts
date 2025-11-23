@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import Entry from "./models/entry.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { exit } from "process";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
@@ -23,6 +23,7 @@ if (connectionString) {
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
 
 // Setup routes and views
 app.get("/leaderboard", async (req: Request, res: Response) => {
