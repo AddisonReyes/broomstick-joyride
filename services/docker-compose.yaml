@@ -7,6 +7,5 @@ services:
     volumes:
       - ./leaderboard:/app
     environment:
-      MONGO_URL: mongodb://admin:123456@mongodb:27017
       BACKEND_PORT: 3000
       NODE_ENV: prod

@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import Entry from "./models/entry.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { exit } from "process";
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,9 @@ const connectionString: string | undefined = process.env.MONGO_URL;
 if (connectionString) {
   mongoose.connect(connectionString);
   console.log(" - Database conected");
+} else {
+  console.error(" + Error connecting database");
+  process.exit();
 }
 
 app.use(express.urlencoded({ extended: false }));
@@ -60,5 +64,9 @@ app.post("/leaderboard", async (req: Request, res: Response) => {
 
 // Listen port
 app.listen(port, () => {
-  console.log(`Server running in http://localhost:${port}`);
+  if (env === "dev") {
+    console.log(`Server running in http://localhost:${port}`);
+  } else {
+    console.log(`Server running`);
+  }
 });
