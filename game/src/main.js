@@ -7,7 +7,7 @@ kaplay({
   font: "alagard",
 });
 
-const debugMode = true;
+const debugMode = false;
 
 // Load Assets
 loadRoot("./");
@@ -237,9 +237,15 @@ scene("user", ({ username }) => {
 });
 
 scene("menu", ({ username }) => {
+  add([
+    text("Broomstick Joyride", { size: 64 }),
+    pos(width() / 2, height() / 2 - 160),
+    anchor("center"),
+  ]);
+
   const playBtn = addButton(
     "Play",
-    vec2(width() / 2 - 128, height() / 2 - 64),
+    vec2(width() / 2, height() / 2 - 64),
     () => {
       go("game", { username: username });
     }
@@ -247,7 +253,7 @@ scene("menu", ({ username }) => {
 
   const userBtn = addButton(
     "User",
-    vec2(width() / 2 - 128, height() / 2 + 32),
+    vec2(width() / 2, height() / 2 + 32),
     () => {
       go("user", { username: username });
     },
@@ -256,7 +262,7 @@ scene("menu", ({ username }) => {
 
   const leaderboardBtn = addButton(
     "Leaderboard",
-    vec2(width() / 2 - 128, height() / 2 + 128),
+    vec2(width() / 2, height() / 2 + 128),
     () => {
       go("leaderboard", { username: username });
     }
@@ -321,15 +327,13 @@ scene("leaderboard", ({ username }) => {
     pageIndicator.text = `Page ${currentPage + 1} / ${totalPages}`;
   }
 
-  // Cargar datos
   const entries = getEntries();
   entries.then((users) => {
-    allUsers = users;
+    allUsers = users.sort((a, b) => b.score - a.score);
     totalPages = Math.ceil(allUsers.length / ITEMS_PER_PAGE);
     renderPage();
   });
 
-  // Navegación con rueda del mouse
   onScroll((delta) => {
     if (delta.y > 0 && currentPage < totalPages - 1) {
       currentPage++;
@@ -340,7 +344,6 @@ scene("leaderboard", ({ username }) => {
     }
   });
 
-  // Navegación con teclas
   onKeyPress("right", () => {
     if (currentPage < totalPages - 1) {
       currentPage++;
@@ -529,7 +532,7 @@ scene("lose", ({ username, score }) => {
 });
 
 function main() {
-  go("leaderboard", { username: "Dakotah", score: 100 });
+  go("menu", { username: "Dakotah", score: 100 });
 }
 
 main();
