@@ -31,13 +31,13 @@ app.get("/leaderboard", async (req, res) => {
 app.post("/leaderboard", async (req, res) => {
     try {
         const { username, score } = req.body;
-        const existingEntry = await Entry.findOne({ username });
+        const existingEntry = await Entry.findOne({ username: username });
         if (existingEntry) {
             if (existingEntry.score < score) {
                 existingEntry.score = score;
-                await Entry.updateOne({ _id: existingEntry._id }, { score });
-                res.status(201).send(existingEntry);
+                await Entry.updateOne({ _id: existingEntry._id }, { score: score });
             }
+            res.status(201).send(existingEntry);
         }
         else {
             const entry = new Entry({ username, score });
