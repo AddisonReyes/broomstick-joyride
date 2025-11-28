@@ -80,7 +80,7 @@ export default function gameScene() {
       vec2(width() / 2, height() / 2 + 32),
       () => {
         if (paused) {
-          go("menu", { username: username });
+          go("lose", { username, score });
         }
       }
     );
@@ -102,7 +102,7 @@ export default function gameScene() {
     });
 
     player.onCollide("object", () => {
-      go("lose", { username, score });
+      // go("lose", { username, score });
     });
 
     onUpdate("object", (obj) => {
@@ -130,8 +130,12 @@ export default function gameScene() {
           lastMilestone = currentScoreInt;
         }
 
-        if (parseInt(score) % 1000 === 0 && currentScoreInt > lastMilestone) {
-          speed -= 10;
+        if (
+          parseInt(score) % 6000 === 0 &&
+          parseInt(score) <= 10000 &&
+          currentScoreInt > lastMilestone
+        ) {
+          spawnObject();
         }
       }
     });
