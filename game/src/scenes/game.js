@@ -20,17 +20,21 @@ export default function gameScene() {
 
     function spawnObject() {
       add([
-        rect(rand(16, 128), rand(32, 128)),
+        rect(rand(32, 160), rand(32, 160)),
         area(),
         outline(4),
         rotate(rand(0, 180)),
-        pos(width() + 200, rand(64, height() - 64)),
+        pos(rand(width() + 300, width() + 600), rand(64, height() - 64)),
         anchor("botleft"),
         hexToRgb(choose(hexColorList)),
         z(-1),
         "object",
       ]);
+
+      wait(rand(0.5, 1.5), spawnObject);
     }
+
+    spawnObject();
 
     // Borders
     add([
@@ -39,7 +43,7 @@ export default function gameScene() {
       outline(4),
       area(),
       body({ isStatic: true }),
-      hexToRgb("#2e222f"),
+      hexToRgb("#141013"),
     ]);
 
     add([
@@ -48,7 +52,7 @@ export default function gameScene() {
       outline(4),
       area(),
       body({ isStatic: true }),
-      hexToRgb("#2e222f"),
+      hexToRgb("#141013"),
     ]);
 
     // Interface
@@ -106,27 +110,29 @@ export default function gameScene() {
         obj.pos.x -= speed * dt();
       }
 
-      if (obj.pos.x < -100) {
+      if (obj.pos.x < -300) {
         obj.destroy();
       }
     });
 
-    let elapsedTime = 0;
+    let scoreMultiplier = 0.1;
+    let lastMilestone = 0;
     onUpdate(() => {
       if (!paused) {
-        elapsedTime += dt();
-
-        score += 1;
+        score += scoreMultiplier;
         scoreLabel.text = `${convertDistance(score)}m`;
 
-        if (elapsedTime <= 1) return;
-        spawnObject();
-        if (rand(0, 1) <= 0.5) {
-          spawnObject();
+        const currentScoreInt = parseInt(score);
+        if (parseInt(score) % 100 === 0 && currentScoreInt > lastMilestone) {
+          scoreMultiplier += 0.006;
+          speed += 10;
+
+          lastMilestone = currentScoreInt;
         }
 
-        elapsedTime -= 1;
-        speed += 6;
+        if (parseInt(score) % 1000 === 0 && currentScoreInt > lastMilestone) {
+          speed -= 10;
+        }
       }
     });
 

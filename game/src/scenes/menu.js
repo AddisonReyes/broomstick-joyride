@@ -5,8 +5,17 @@ export default function menuScene() {
   scene("menu", ({ username }) => {
     add([
       text("Broomstick Joyride", { size: 64 }),
+      pos(width() / 2, height() / 2 - 160 + 6),
+      anchor("center"),
+      color(0, 0, 0),
+      z(-1),
+    ]);
+
+    add([
+      text("Broomstick Joyride", { size: 64 }),
       pos(width() / 2, height() / 2 - 160),
       anchor("center"),
+      z(1),
     ]);
 
     const playBtn = addButton(

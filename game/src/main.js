@@ -10,7 +10,8 @@ import { hexToRgb } from "./utils.js";
 
 // Start game
 kaplay({
-  background: hexToRgb("#625565", true),
+  background: hexToRgb("#242234", true),
+  pixelated: true,
   font: "alagard",
 });
 
@@ -29,7 +30,7 @@ loseScene();
 menuScene();
 
 function main() {
-  go("user", { username: "Dakotah" });
+  go("game", { username: "Dakotah" });
 }
 
 main();
