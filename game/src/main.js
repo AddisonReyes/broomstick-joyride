@@ -17,7 +17,7 @@ kaplay({
 // Load Assets
 loadRoot("./");
 
-loadSprite("player", "sprites/bean.png");
+loadSprite("player", "sprites/player.png");
 
 loadFont("alagard", "fonts/alagard.ttf", { filter: "nearest" });
 
