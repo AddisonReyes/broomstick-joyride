@@ -15,7 +15,7 @@ export async function listLeaderboardEntries(): Promise<LeaderboardEntry[]> {
 }
 
 export async function saveLeaderboardEntry(
-  submission: LeaderboardSubmission
+  submission: LeaderboardSubmission,
 ): Promise<{ entry: LeaderboardEntry; created: boolean }> {
   const existingEntry = await Entry.findOne({ username: submission.username });
 

@@ -1,6 +1,7 @@
 import "kaplay/global";
 
 type ButtonHandler = () => void;
+type RgbTuple = [number, number, number];
 
 export function addButton(
   buttonLabel = "text",
@@ -56,8 +57,7 @@ export function addButton(
 
 export function hexToRgb(
   hex: string,
-  returnList = false,
-): number[] | ReturnType<typeof color> | null {
+): RgbTuple | null {
   let cleanHex = hex.replace(/^#/, "");
 
   if (cleanHex.length === 3) {
@@ -75,10 +75,17 @@ export function hexToRgb(
   const green = parseInt(cleanHex.substring(2, 4), 16);
   const blue = parseInt(cleanHex.substring(4, 6), 16);
 
-  if (returnList) {
-    return [red, green, blue];
+  return [red, green, blue];
+}
+
+export function hexToColor(hex: string): ReturnType<typeof color> | null {
+  const rgbValues = hexToRgb(hex);
+
+  if (!rgbValues) {
+    return null;
   }
 
+  const [red, green, blue] = rgbValues;
   return color(red, green, blue);
 }
 

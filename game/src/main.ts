@@ -12,15 +12,17 @@ bootGame();
 
 function bootGame(): void {
   kaplay({
-    background: hexToRgb("#242234", true),
-    pixelated: true,
+    background: hexToRgb("#242234") ?? [36, 34, 52],
+    crisp: true,
+    texFilter: "nearest",
     font: "alagard",
   });
 
   loadAssets();
   registerScenes();
 
-  go("game", { username: gameConfig.defaultUsername });
+  // gameConfig.defaultUsername;
+  go("user", { username: "" });
 }
 
 function loadAssets(): void {

@@ -5,7 +5,13 @@ import {
   obstacleColors,
 } from "../constants.js";
 import type { PlayerSceneData } from "../types.js";
-import { addButton, convertDistance, hexToRgb } from "../utils.js";
+import { convertDistance, hexToColor } from "../utils.js";
+import {
+  addArcaneNightBackdrop,
+  addArcaneButton,
+  addArcanePanel,
+  getArcanePalette,
+} from "../ui/arcane.js";
 
 type ObstaclePattern =
   | "single"
@@ -27,6 +33,10 @@ const bandRatios: Record<VerticalBand, number> = {
 
 export default function gameScene(): void {
   scene("game", ({ username }: PlayerSceneData) => {
+    const palette = getArcanePalette();
+
+    addArcaneNightBackdrop();
+
     const player = add([
       sprite("player"),
       pos(gameSettings.playerStartX, height() / 2),
@@ -35,43 +45,75 @@ export default function gameScene(): void {
     ]);
 
     let worldSpeed: number = gameSettings.initialWorldSpeed;
-    let score = 0;
-    let paused = false;
     let lastSingleBand: VerticalBand = "center";
+    let paused = false;
+    let score = 0;
 
-    const continueButton = addButton(
-      "Continue",
-      vec2(width() / 2, height() / 2 - 64),
+    add([
+      rect(256, 64, { radius: 18 }),
+      pos(width() / 2, 52),
+      anchor("center"),
+      outline(4, palette.buttonOutline),
+      color(palette.buttonBase),
+      opacity(0.94),
+      fixed(),
+      z(25),
+    ]);
+
+    const scoreLabel = add([
+      text(`${convertDistance(score)}m`, { size: 32 }),
+      pos(width() / 2, 54),
+      anchor("center"),
+      color(palette.parchment),
+      fixed(),
+      z(26),
+    ]);
+
+    const pausePanel = addArcanePanel(
+      vec2(width() / 2, height() / 2 - 18),
+      vec2(430, 300),
+      40,
     );
 
-    const exitButton = addButton(
+    const pauseTitle = add([
+      text("Paused", { size: 32 }),
+      pos(width() / 2, height() / 2 - 104),
+      anchor("center"),
+      color(palette.goldGlow),
+      fixed(),
+      z(41),
+    ]);
+
+    const continueButton = addArcaneButton(
+      "Continue",
+      vec2(width() / 2, height() / 2 - 32),
+      () => {
+        if (paused) {
+          togglePauseMenu();
+        }
+      },
+      "",
+      220,
+      42,
+    );
+
+    const exitButton = addArcaneButton(
       "Exit",
-      vec2(width() / 2, height() / 2 + 32),
+      vec2(width() / 2, height() / 2 + 64),
       () => {
         if (paused) {
           go("lose", { username, score });
         }
       },
+      "",
+      220,
+      42,
     );
-
-    const scoreLabel = add([
-      text(`${convertDistance(score)}m`),
-      pos(width() / 2, 32),
-      anchor("center"),
-      z(20),
-      color(255, 255, 255),
-    ]);
 
     addBorder(0);
     addBorder(height() - gameSettings.borderHeight);
-    hidePauseButtons();
+    setPauseOverlayVisible(false);
     scheduleNextWave();
-
-    continueButton.onClick(() => {
-      if (!continueButton.hidden) {
-        togglePauseMenu();
-      }
-    });
 
     player.onUpdate(() => {
       if (!paused) {
@@ -121,13 +163,14 @@ export default function gameScene(): void {
 
     function togglePauseMenu(): void {
       paused = !paused;
-      continueButton.hidden = !paused;
-      exitButton.hidden = !paused;
+      setPauseOverlayVisible(paused);
     }
 
-    function hidePauseButtons(): void {
-      continueButton.hidden = true;
-      exitButton.hidden = true;
+    function setPauseOverlayVisible(visible: boolean): void {
+      pausePanel.hidden = !visible;
+      pauseTitle.hidden = !visible;
+      continueButton.hidden = !visible;
+      exitButton.hidden = !visible;
     }
 
     function scheduleNextWave(): void {
@@ -263,7 +306,7 @@ export default function gameScene(): void {
         rotate(rand(0, 180)),
         outline(4),
         anchor("center"),
-        hexToRgb(obstacleColor),
+        hexToColor(obstacleColor) ?? color(255, 255, 255),
         z(-1),
         "object",
       ]);
@@ -303,7 +346,8 @@ export default function gameScene(): void {
         outline(4),
         area(),
         body({ isStatic: true }),
-        hexToRgb("#141013"),
+        color(palette.nightBlue),
+        opacity(0.64),
       ]);
     }
   });

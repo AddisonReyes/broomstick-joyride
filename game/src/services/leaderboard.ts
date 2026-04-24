@@ -5,6 +5,7 @@ import type { LeaderboardEntry, LeaderboardResponse } from "../types.js";
 const requestHeaders = {
   "Content-Type": "application/json",
 };
+const developmentMockEntries = createDevelopmentMockEntries();
 
 export async function getEntries(): Promise<LeaderboardResponse> {
   try {
@@ -15,10 +16,15 @@ export async function getEntries(): Promise<LeaderboardResponse> {
     }
 
     const data = (await response.json()) as unknown;
+    const realEntries = Array.isArray(data) ? (data as LeaderboardEntry[]) : [];
+
+    if (import.meta.env.DEV) {
+      realEntries.push(...developmentMockEntries);
+    }
 
     return {
       ok: true,
-      data: Array.isArray(data) ? (data as LeaderboardEntry[]) : [],
+      data: realEntries,
       message: "",
     };
   } catch {
@@ -33,11 +39,14 @@ export async function postEntry(
   const normalizedScore = Math.max(0, Math.floor(score));
 
   try {
-    const response = await fetch(`${gameConfig.leaderboardApiUrl}/leaderboard`, {
-      method: "POST",
-      headers: requestHeaders,
-      body: JSON.stringify({ username, score: normalizedScore }),
-    });
+    const response = await fetch(
+      `${gameConfig.leaderboardApiUrl}/leaderboard`,
+      {
+        method: "POST",
+        headers: requestHeaders,
+        body: JSON.stringify({ username, score: normalizedScore }),
+      },
+    );
 
     if (!response.ok) {
       throw new Error("Unable to submit score.");
@@ -53,4 +62,15 @@ function createUnavailableResponse(): LeaderboardResponse {
     data: [],
     message: uiText.leaderboardUnavailable,
   };
+}
+
+function createDevelopmentMockEntries(): LeaderboardEntry[] {
+  return Array.from({ length: 67 }, (_value, index) => {
+    const entryNumber = index + 1;
+
+    return {
+      username: `user${entryNumber}`,
+      score: entryNumber,
+    };
+  });
 }

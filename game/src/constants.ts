@@ -9,12 +9,12 @@ export const uiText = {
 } as const;
 
 export const obstacleColors = [
-  "#e4d2aa",
-  "#c7b08b",
-  "#a08662",
-  "#796755",
-  "#5a4e44",
-  "#423934",
+  "#6de0d6",
+  "#5981c4",
+  "#5467a5",
+  "#39518f",
+  "#2c315a",
+  "#1c1f3a",
 ] as const;
 
 export const leaderboardSettings = {

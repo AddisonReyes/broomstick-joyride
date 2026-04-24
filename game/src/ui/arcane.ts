@@ -1,36 +1,34 @@
 import "kaplay/global";
-import type { PlayerSceneData } from "../types.js";
 
-type MenuAction = () => void;
+type ArcaneAction = () => void;
 type Vector2 = ReturnType<typeof vec2>;
 
-export default function menuScene(): void {
-  scene("menu", ({ username }: PlayerSceneData) => {
-    setCursor("default");
-
-    addArcaneNightBackground();
-    addTitleBlock();
-    addMenuButton("Play", vec2(width() / 2, height() / 2 - 32), () => {
-      go("game", { username });
-    });
-
-    addMenuButton(
-      "Username",
-      vec2(width() / 2, height() / 2 + 72),
-      () => {
-        go("user", { username });
-      },
-      username,
-    );
-
-    addMenuButton("Leaderboard", vec2(width() / 2, height() / 2 + 176), () => {
-      go("leaderboard", { username });
-    });
-  });
+export function getArcanePalette() {
+  return {
+    moonColor: rgb(248, 231, 180),
+    nightBlue: rgb(14, 17, 40),
+    mistBlue: rgb(42, 58, 92),
+    arcaneBlue: rgb(89, 129, 196),
+    arcaneGlow: rgb(109, 224, 214),
+    goldGlow: rgb(226, 196, 120),
+    inkBlack: rgb(12, 11, 24),
+    parchment: rgb(235, 224, 198),
+    footerBlue: rgb(150, 176, 221),
+    titleBlue: rgb(161, 194, 221),
+    buttonOutline: rgb(85, 113, 164),
+    buttonBase: rgb(28, 31, 58),
+    buttonGlow: rgb(57, 70, 114),
+    panelInner: rgb(44, 49, 90),
+    buttonHover: rgb(38, 42, 76),
+    buttonHoverGlow: rgb(84, 103, 165),
+    descriptionBlue: rgb(183, 202, 227),
+    labelHover: rgb(249, 239, 217),
+    danger: rgb(203, 108, 124),
+  };
 }
 
-function addArcaneNightBackground(): void {
-  const palette = getMenuPalette();
+export function addArcaneNightBackdrop(footerText: string = ""): void {
+  const palette = getArcanePalette();
 
   add([
     rect(width(), height()),
@@ -97,20 +95,17 @@ function addArcaneNightBackground(): void {
   ]);
 
   for (let index = 0; index < 20; index++) {
-    const starX = rand(48, width() - 48);
-    const starY = rand(32, height() * 0.5);
-    const starScale = rand(1, 2.6);
-    const driftSpeed = rand(1.2, 3.4);
-    const driftOffset = rand(0, 10);
-
     const star = add([
-      circle(starScale),
-      pos(starX, starY),
+      circle(rand(1, 2.6)),
+      pos(rand(48, width() - 48), rand(32, height() * 0.5)),
       color(index % 3 === 0 ? palette.goldGlow : palette.parchment),
       opacity(rand(0.45, 0.95)),
       fixed(),
       z(-70),
     ]);
+
+    const driftSpeed = rand(1.2, 3.4);
+    const driftOffset = rand(0, 10);
 
     star.onUpdate(() => {
       star.opacity = wave(0.25, 0.95, time() * driftSpeed + driftOffset);
@@ -118,7 +113,7 @@ function addArcaneNightBackground(): void {
   }
 
   add([
-    text("Made by Dakotitah", { size: 16 }),
+    text(footerText, { size: 16 }),
     pos(width() / 2, height() - 42),
     anchor("center"),
     color(palette.footerBlue),
@@ -128,71 +123,49 @@ function addArcaneNightBackground(): void {
   ]);
 }
 
-function addTitleBlock(): void {
-  const palette = getMenuPalette();
+export function addArcanePanel(
+  center: Vector2,
+  panelSize: Vector2,
+  layer = 10,
+) {
+  const palette = getArcanePalette();
 
-  add([
-    text("Broomstick", { size: 38 }),
-    pos(width() / 2, 98),
+  const panel = add([
+    rect(panelSize.x, panelSize.y, { radius: 22 }),
+    pos(center),
     anchor("center"),
-    color(palette.goldGlow),
+    outline(4, palette.buttonOutline),
+    color(palette.buttonBase),
+    opacity(0.94),
     fixed(),
-    z(10),
+    z(layer),
   ]);
 
-  add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 162),
+  panel.add([
+    rect(panelSize.x - 26, panelSize.y - 26, { radius: 18 }),
     anchor("center"),
-    color(palette.inkBlack),
-    opacity(0.55),
-    fixed(),
-    z(9),
+    color(palette.panelInner),
+    opacity(0.88),
   ]);
 
-  add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 154),
-    anchor("center"),
-    color(palette.parchment),
-    fixed(),
-    z(12),
-  ]);
-
-  const glowTitle = add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 154),
-    anchor("center"),
-    color(palette.arcaneGlow),
-    opacity(0.18),
-    fixed(),
-    z(11),
-  ]);
-
-  glowTitle.onUpdate(() => {
-    glowTitle.opacity = wave(0.1, 0.28, time() * 2.2);
-  });
-
-  add([
-    text("Dash through the enchanted night", { size: 16 }),
-    pos(width() / 2, 222),
-    anchor("center"),
-    color(palette.titleBlue),
-    fixed(),
-    z(10),
-  ]);
+  return panel;
 }
 
-function addMenuButton(
+export function addArcaneButton(
   label: string,
   buttonCenter: Vector2,
-  onClick: MenuAction,
+  onClick: ArcaneAction,
   description = "",
+  widthPx = 320,
+  layer = 20,
 ) {
-  const palette = getMenuPalette();
+  const palette = getArcanePalette();
+  const glyphX = -(widthPx / 2) + 34;
+  const labelCenterX = 12;
+  const labelCenterY = 2;
 
   const button = add([
-    rect(320, 76, { radius: 16 }),
+    rect(widthPx, 76, { radius: 16 }),
     pos(buttonCenter),
     anchor("center"),
     area(),
@@ -201,11 +174,11 @@ function addMenuButton(
     color(palette.buttonBase),
     opacity(0.96),
     fixed(),
-    z(20),
+    z(layer),
   ]);
 
   const innerGlow = button.add([
-    rect(296, 52, { radius: 12 }),
+    rect(widthPx - 24, 52, { radius: 12 }),
     anchor("center"),
     color(palette.buttonGlow),
     opacity(0.68),
@@ -213,7 +186,7 @@ function addMenuButton(
 
   const glyph = button.add([
     circle(12),
-    pos(-126, 0),
+    pos(glyphX, 0),
     anchor("center"),
     scale(1),
     color(palette.arcaneGlow),
@@ -222,18 +195,19 @@ function addMenuButton(
 
   const labelText = button.add([
     text(label, { size: 32 }),
+    pos(labelCenterX, labelCenterY),
     anchor("center"),
     color(palette.parchment),
   ]);
 
   const descriptionText = add([
     text(description, { size: 16, width: 220 }),
-    pos(buttonCenter.x + 188, buttonCenter.y),
+    pos(buttonCenter.x + widthPx / 2 + 28, buttonCenter.y),
     anchor("left"),
     color(palette.descriptionBlue),
     opacity(description ? 0.65 : 0),
     fixed(),
-    z(19),
+    z(layer - 1),
   ]);
 
   button.onHoverUpdate(() => {
@@ -267,26 +241,4 @@ function addMenuButton(
   button.onClick(onClick);
 
   return button;
-}
-
-function getMenuPalette() {
-  return {
-    moonColor: rgb(248, 231, 180),
-    nightBlue: rgb(14, 17, 40),
-    mistBlue: rgb(42, 58, 92),
-    arcaneBlue: rgb(89, 129, 196),
-    arcaneGlow: rgb(109, 224, 214),
-    goldGlow: rgb(226, 196, 120),
-    inkBlack: rgb(12, 11, 24),
-    parchment: rgb(235, 224, 198),
-    footerBlue: rgb(150, 176, 221),
-    titleBlue: rgb(161, 194, 221),
-    buttonOutline: rgb(85, 113, 164),
-    buttonBase: rgb(28, 31, 58),
-    buttonGlow: rgb(57, 70, 114),
-    buttonHover: rgb(38, 42, 76),
-    buttonHoverGlow: rgb(84, 103, 165),
-    descriptionBlue: rgb(183, 202, 227),
-    labelHover: rgb(249, 239, 217),
-  };
 }
