@@ -21,11 +21,9 @@ export default function leaderboardScene(): void {
     const tableLeft = tableCenterX - tableWidth / 2;
     const rowHorizontalPadding = 18;
     const rankColumnWidth = 76;
-    const scoreColumnWidth = 124;
     const riderColumnLeft = tableLeft + rowHorizontalPadding + rankColumnWidth;
     const rankColumnLeft = tableLeft + rowHorizontalPadding;
     const scoreColumnRight = tableLeft + tableWidth - rowHorizontalPadding;
-    const riderColumnRight = scoreColumnRight - scoreColumnWidth;
 
     addArcaneNightBackdrop();
     addArcanePanel(panelCenter, panelSize, 10);

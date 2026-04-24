@@ -1,20 +1,24 @@
 import "kaplay/global";
 import type { PlayerSceneData } from "../types.js";
-
-type MenuAction = () => void;
-type Vector2 = ReturnType<typeof vec2>;
+import {
+  addArcaneButton,
+  addArcaneNightBackdrop,
+  getArcanePalette,
+} from "../ui/arcane.js";
 
 export default function menuScene(): void {
   scene("menu", ({ username }: PlayerSceneData) => {
-    setCursor("default");
+    const palette = getArcanePalette();
 
-    addArcaneNightBackground();
-    addTitleBlock();
-    addMenuButton("Play", vec2(width() / 2, height() / 2 - 32), () => {
+    setCursor("default");
+    addArcaneNightBackdrop("Made by Dakotitah");
+    addTitleBlock(palette);
+
+    addArcaneButton("Play", vec2(width() / 2, height() / 2 - 32), () => {
       go("game", { username });
     });
 
-    addMenuButton(
+    addArcaneButton(
       "Username",
       vec2(width() / 2, height() / 2 + 72),
       () => {
@@ -23,114 +27,17 @@ export default function menuScene(): void {
       username,
     );
 
-    addMenuButton("Leaderboard", vec2(width() / 2, height() / 2 + 176), () => {
-      go("leaderboard", { username });
-    });
+    addArcaneButton(
+      "Leaderboard",
+      vec2(width() / 2, height() / 2 + 176),
+      () => {
+        go("leaderboard", { username });
+      },
+    );
   });
 }
 
-function addArcaneNightBackground(): void {
-  const palette = getMenuPalette();
-
-  add([
-    rect(width(), height()),
-    pos(0, 0),
-    color(palette.nightBlue),
-    fixed(),
-    z(-100),
-  ]);
-
-  add([
-    circle(96),
-    pos(width() - 160, 120),
-    color(palette.moonColor),
-    opacity(0.95),
-    fixed(),
-    z(-90),
-  ]);
-
-  add([
-    circle(124),
-    pos(width() - 160, 120),
-    color(palette.goldGlow),
-    opacity(0.12),
-    fixed(),
-    z(-91),
-  ]);
-
-  add([
-    rect(width() * 0.82, 220, { radius: 28 }),
-    pos(width() * 0.1, height() - 220),
-    color(palette.mistBlue),
-    opacity(0.28),
-    rotate(-4),
-    fixed(),
-    z(-80),
-  ]);
-
-  add([
-    rect(width() * 0.68, 180, { radius: 24 }),
-    pos(width() * 0.38, height() - 160),
-    color(palette.arcaneBlue),
-    opacity(0.14),
-    rotate(5),
-    fixed(),
-    z(-79),
-  ]);
-
-  add([
-    rect(170, height() * 0.55),
-    pos(width() * 0.08, height() * 0.45),
-    color(palette.inkBlack),
-    opacity(0.65),
-    fixed(),
-    z(-78),
-  ]);
-
-  add([
-    rect(120, height() * 0.42),
-    pos(width() * 0.78, height() * 0.58),
-    color(palette.inkBlack),
-    opacity(0.58),
-    fixed(),
-    z(-78),
-  ]);
-
-  for (let index = 0; index < 20; index++) {
-    const starX = rand(48, width() - 48);
-    const starY = rand(32, height() * 0.5);
-    const starScale = rand(1, 2.6);
-    const driftSpeed = rand(1.2, 3.4);
-    const driftOffset = rand(0, 10);
-
-    const star = add([
-      circle(starScale),
-      pos(starX, starY),
-      color(index % 3 === 0 ? palette.goldGlow : palette.parchment),
-      opacity(rand(0.45, 0.95)),
-      fixed(),
-      z(-70),
-    ]);
-
-    star.onUpdate(() => {
-      star.opacity = wave(0.25, 0.95, time() * driftSpeed + driftOffset);
-    });
-  }
-
-  add([
-    text("Made by Dakotitah", { size: 16 }),
-    pos(width() / 2, height() - 42),
-    anchor("center"),
-    color(palette.footerBlue),
-    opacity(0.72),
-    fixed(),
-    z(5),
-  ]);
-}
-
-function addTitleBlock(): void {
-  const palette = getMenuPalette();
-
+function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   add([
     text("Broomstick", { size: 38 }),
     pos(width() / 2, 98),
@@ -181,112 +88,4 @@ function addTitleBlock(): void {
     fixed(),
     z(10),
   ]);
-}
-
-function addMenuButton(
-  label: string,
-  buttonCenter: Vector2,
-  onClick: MenuAction,
-  description = "",
-) {
-  const palette = getMenuPalette();
-
-  const button = add([
-    rect(320, 76, { radius: 16 }),
-    pos(buttonCenter),
-    anchor("center"),
-    area(),
-    scale(1),
-    outline(4, palette.buttonOutline),
-    color(palette.buttonBase),
-    opacity(0.96),
-    fixed(),
-    z(20),
-  ]);
-
-  const innerGlow = button.add([
-    rect(296, 52, { radius: 12 }),
-    anchor("center"),
-    color(palette.buttonGlow),
-    opacity(0.68),
-  ]);
-
-  const glyph = button.add([
-    circle(12),
-    pos(-126, 0),
-    anchor("center"),
-    scale(1),
-    color(palette.arcaneGlow),
-    opacity(0.9),
-  ]);
-
-  const labelText = button.add([
-    text(label, { size: 32 }),
-    anchor("center"),
-    color(palette.parchment),
-  ]);
-
-  const descriptionText = add([
-    text(description, { size: 16, width: 220 }),
-    pos(buttonCenter.x + 188, buttonCenter.y),
-    anchor("left"),
-    color(palette.descriptionBlue),
-    opacity(description ? 0.65 : 0),
-    fixed(),
-    z(19),
-  ]);
-
-  button.onHoverUpdate(() => {
-    setCursor("pointer");
-    button.scale = vec2(1.04);
-    button.color = palette.buttonHover;
-    innerGlow.color = palette.buttonHoverGlow;
-    glyph.scale = vec2(1.2);
-    glyph.color = palette.goldGlow;
-    labelText.color = palette.labelHover;
-
-    if (description) {
-      descriptionText.opacity = 1;
-    }
-  });
-
-  button.onHoverEnd(() => {
-    setCursor("default");
-    button.scale = vec2(1);
-    button.color = palette.buttonBase;
-    innerGlow.color = palette.buttonGlow;
-    glyph.scale = vec2(1);
-    glyph.color = palette.arcaneGlow;
-    labelText.color = palette.parchment;
-
-    if (description) {
-      descriptionText.opacity = 0.65;
-    }
-  });
-
-  button.onClick(onClick);
-
-  return button;
-}
-
-function getMenuPalette() {
-  return {
-    moonColor: rgb(248, 231, 180),
-    nightBlue: rgb(14, 17, 40),
-    mistBlue: rgb(42, 58, 92),
-    arcaneBlue: rgb(89, 129, 196),
-    arcaneGlow: rgb(109, 224, 214),
-    goldGlow: rgb(226, 196, 120),
-    inkBlack: rgb(12, 11, 24),
-    parchment: rgb(235, 224, 198),
-    footerBlue: rgb(150, 176, 221),
-    titleBlue: rgb(161, 194, 221),
-    buttonOutline: rgb(85, 113, 164),
-    buttonBase: rgb(28, 31, 58),
-    buttonGlow: rgb(57, 70, 114),
-    buttonHover: rgb(38, 42, 76),
-    buttonHoverGlow: rgb(84, 103, 165),
-    descriptionBlue: rgb(183, 202, 227),
-    labelHover: rgb(249, 239, 217),
-  };
 }

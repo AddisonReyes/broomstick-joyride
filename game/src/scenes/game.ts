@@ -13,13 +13,6 @@ import {
   getArcanePalette,
 } from "../ui/arcane.js";
 
-type ObstaclePattern =
-  | "single"
-  | "staggered"
-  | "topBottom"
-  | "triple"
-  | "edgeTrap";
-
 type DifficultyStage = (typeof difficultyStages)[number];
 type VerticalBand = "top" | "upperMid" | "center" | "lowerMid" | "bottom";
 

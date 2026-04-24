@@ -1,59 +1,6 @@
 import "kaplay/global";
 
-type ButtonHandler = () => void;
 type RgbTuple = [number, number, number];
-
-export function addButton(
-  buttonLabel = "text",
-  position = vec2(200, 100),
-  onClick: ButtonHandler = () => {},
-  descriptionLabel = "",
-) {
-  const button = add([
-    rect(240, 80, { radius: 6 }),
-    pos(position),
-    area(),
-    scale(1),
-    anchor("center"),
-    outline(4),
-    color(255, 255, 255),
-  ]);
-
-  const description = add([
-    text(descriptionLabel),
-    pos(button.pos.x + 160, button.pos.y),
-    anchor("left"),
-  ]);
-
-  description.hidden = true;
-
-  button.add([text(buttonLabel), anchor("center"), color(0, 0, 0)]);
-
-  button.onHoverUpdate(() => {
-    const hoverTime = time() * 10;
-
-    button.color = hsl2rgb((hoverTime / 10) % 1, 0.6, 0.7);
-    button.scale = vec2(1.1);
-    setCursor("pointer");
-
-    if (descriptionLabel) {
-      description.hidden = false;
-    }
-  });
-
-  button.onHoverEnd(() => {
-    if (descriptionLabel) {
-      description.hidden = true;
-    }
-
-    button.scale = vec2(1);
-    button.color = rgb();
-  });
-
-  button.onClick(onClick);
-
-  return button;
-}
 
 export function hexToRgb(
   hex: string,

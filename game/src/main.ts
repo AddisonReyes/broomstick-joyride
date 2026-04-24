@@ -1,6 +1,5 @@
 import kaplay from "kaplay";
 import "kaplay/global";
-import { gameConfig } from "./config.js";
 import gameScene from "./scenes/game.js";
 import leaderboardScene from "./scenes/leaderboard.js";
 import loseScene from "./scenes/lose.js";
@@ -20,8 +19,6 @@ function bootGame(): void {
 
   loadAssets();
   registerScenes();
-
-  // gameConfig.defaultUsername;
   go("user", { username: "" });
 }
 

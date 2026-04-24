@@ -112,15 +112,17 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
     });
   }
 
-  add([
-    text(footerText, { size: 16 }),
-    pos(width() / 2, height() - 42),
-    anchor("center"),
-    color(palette.footerBlue),
-    opacity(0.72),
-    fixed(),
-    z(5),
-  ]);
+  if (footerText) {
+    add([
+      text(footerText, { size: 16 }),
+      pos(width() / 2, height() - 42),
+      anchor("center"),
+      color(palette.footerBlue),
+      opacity(0.72),
+      fixed(),
+      z(5),
+    ]);
+  }
 }
 
 export function addArcanePanel(

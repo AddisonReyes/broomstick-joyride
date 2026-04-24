@@ -5,26 +5,27 @@ import type { LeaderboardEntry, LeaderboardResponse } from "../types.js";
 const requestHeaders = {
   "Content-Type": "application/json",
 };
+const leaderboardRoute = "/leaderboard";
 const developmentMockEntries = createDevelopmentMockEntries();
 
 export async function getEntries(): Promise<LeaderboardResponse> {
   try {
-    const response = await fetch(`${gameConfig.leaderboardApiUrl}/leaderboard`);
+    const response = await fetch(`${gameConfig.leaderboardApiUrl}${leaderboardRoute}`);
 
     if (!response.ok) {
       return createUnavailableResponse();
     }
 
     const data = (await response.json()) as unknown;
-    const realEntries = Array.isArray(data) ? (data as LeaderboardEntry[]) : [];
+    const entries = Array.isArray(data) ? (data as LeaderboardEntry[]) : [];
 
     if (import.meta.env.DEV) {
-      realEntries.push(...developmentMockEntries);
+      entries.push(...developmentMockEntries);
     }
 
     return {
       ok: true,
-      data: realEntries,
+      data: entries,
       message: "",
     };
   } catch {
@@ -39,14 +40,11 @@ export async function postEntry(
   const normalizedScore = Math.max(0, Math.floor(score));
 
   try {
-    const response = await fetch(
-      `${gameConfig.leaderboardApiUrl}/leaderboard`,
-      {
-        method: "POST",
-        headers: requestHeaders,
-        body: JSON.stringify({ username, score: normalizedScore }),
-      },
-    );
+    const response = await fetch(`${gameConfig.leaderboardApiUrl}${leaderboardRoute}`, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify({ username, score: normalizedScore }),
+    });
 
     if (!response.ok) {
       throw new Error("Unable to submit score.");
@@ -66,11 +64,11 @@ function createUnavailableResponse(): LeaderboardResponse {
 
 function createDevelopmentMockEntries(): LeaderboardEntry[] {
   return Array.from({ length: 67 }, (_value, index) => {
-    const entryNumber = index + 1;
+    const score = index + 1;
 
     return {
-      username: `user${entryNumber}`,
-      score: entryNumber,
+      username: `user${score}`,
+      score,
     };
   });
 }
