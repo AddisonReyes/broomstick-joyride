@@ -9,11 +9,11 @@ function buildCorsOptions(origins: string[]): CorsOptions {
   return {
     origin: (origin, callback) => {
       if (!origin) {
-        callback(new Error("Origin header is required."));
+        callback(null, true);
         return;
       }
 
-      if (origins.includes(origin)) {
+      if (matchesAllowedOrigin(origin, origins)) {
         callback(null, true);
         return;
       }
@@ -24,4 +24,36 @@ function buildCorsOptions(origins: string[]): CorsOptions {
     allowedHeaders: ["Content-Type"],
     optionsSuccessStatus: 204,
   };
+}
+
+function matchesAllowedOrigin(origin: string, allowedOrigins: string[]): boolean {
+  return allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin.includes("*")) {
+      return matchesWildcardOrigin(origin, allowedOrigin);
+    }
+
+    return origin === allowedOrigin;
+  });
+}
+
+function matchesWildcardOrigin(origin: string, allowedOrigin: string): boolean {
+  const wildcardMatch = allowedOrigin.match(/^(https?):\/\/\*\.(.+)$/i);
+
+  if (!wildcardMatch) {
+    return false;
+  }
+
+  const [, protocol, host] = wildcardMatch;
+
+  try {
+    const originUrl = new URL(origin);
+
+    return (
+      originUrl.protocol === `${protocol}:` &&
+      originUrl.hostname !== host &&
+      originUrl.hostname.endsWith(`.${host}`)
+    );
+  } catch {
+    return false;
+  }
 }
