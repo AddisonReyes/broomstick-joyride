@@ -8,11 +8,6 @@ export const uiText = {
   usernameIdle: ". . .",
 } as const;
 
-export const viewport = {
-  width: 1980,
-  height: 1080,
-} as const;
-
 export const obstacleColors = [
   "#6de0d6",
   "#5981c4",
