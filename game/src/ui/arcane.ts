@@ -4,7 +4,7 @@ import { scaleUi } from "../layout.js";
 type ArcaneAction = () => void;
 type Vector2 = ReturnType<typeof vec2>;
 
-export function getArcanePalette() {
+function createArcanePalette() {
   return {
     moonColor: rgb(248, 231, 180),
     nightBlue: rgb(14, 17, 40),
@@ -26,6 +26,12 @@ export function getArcanePalette() {
     labelHover: rgb(249, 239, 217),
     danger: rgb(203, 108, 124),
   };
+}
+
+export type ArcanePalette = ReturnType<typeof createArcanePalette>;
+
+export function getArcanePalette(): ArcanePalette {
+  return createArcanePalette();
 }
 
 export function addArcaneNightBackdrop(footerText: string = ""): void {

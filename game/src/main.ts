@@ -24,7 +24,7 @@ function bootGame(): void {
 
   loadAssets();
   registerScenes();
-  go("user", { username: "" });
+  go("game", { username: "Dako" });
 }
 
 function loadAssets(): void {

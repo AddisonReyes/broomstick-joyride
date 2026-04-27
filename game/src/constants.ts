@@ -34,13 +34,9 @@ export const gameSettings = {
   speedLerpPerSecond: 120,
   scorePerSecondAtBaseSpeed: 48,
   borderHeight: 48,
-  obstacleMinSize: 32,
-  obstacleMaxSize: 160,
   obstacleSpawnMinOffsetX: 300,
   obstacleSpawnMaxOffsetX: 600,
-  obstacleSpawnPaddingY: 64,
   obstacleDestroyX: -300,
-  obstacleVerticalGapPadding: 72,
   obstaclePairSpacingX: 170,
   obstacleTripleSpacingX: 150,
 } as const;
