@@ -5,16 +5,24 @@ import leaderboardScene from "./scenes/leaderboard.js";
 import loseScene from "./scenes/lose.js";
 import menuScene from "./scenes/menu.js";
 import userScene from "./scenes/user.js";
+import { viewport } from "./constants.js";
 import { hexToRgb } from "./utils.js";
 
 bootGame();
 
 function bootGame(): void {
+  const gameRoot = getGameRoot();
+
   kaplay({
+    width: viewport.width,
+    height: viewport.height,
     background: hexToRgb("#242234") ?? [36, 34, 52],
     crisp: true,
     texFilter: "nearest",
     font: "alagard",
+    root: gameRoot,
+    stretch: true,
+    letterbox: true,
   });
 
   loadAssets();
@@ -34,4 +42,14 @@ function registerScenes(): void {
   gameScene();
   loseScene();
   menuScene();
+}
+
+function getGameRoot(): HTMLElement {
+  const gameRoot = document.getElementById("game-root");
+
+  if (!gameRoot) {
+    throw new Error("Missing #game-root element.");
+  }
+
+  return gameRoot;
 }

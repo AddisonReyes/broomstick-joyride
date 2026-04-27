@@ -8,6 +8,11 @@ export const uiText = {
   usernameIdle: ". . .",
 } as const;
 
+export const viewport = {
+  width: 1980,
+  height: 1020,
+} as const;
+
 export const obstacleColors = [
   "#6de0d6",
   "#5981c4",
@@ -66,7 +71,13 @@ export const difficultyStages = [
     spawnDelayMax: 1.2,
     obstacleSizeMin: 62,
     obstacleSizeMax: 124,
-    availablePatterns: ["single", "staggered", "topBottom", "triple", "edgeTrap"],
+    availablePatterns: [
+      "single",
+      "staggered",
+      "topBottom",
+      "triple",
+      "edgeTrap",
+    ],
   },
   {
     minScore: 1400,
@@ -75,7 +86,13 @@ export const difficultyStages = [
     spawnDelayMax: 1.05,
     obstacleSizeMin: 70,
     obstacleSizeMax: 136,
-    availablePatterns: ["staggered", "topBottom", "triple", "triple", "edgeTrap"],
+    availablePatterns: [
+      "staggered",
+      "topBottom",
+      "triple",
+      "triple",
+      "edgeTrap",
+    ],
   },
   {
     minScore: 2400,
@@ -84,6 +101,12 @@ export const difficultyStages = [
     spawnDelayMax: 0.95,
     obstacleSizeMin: 78,
     obstacleSizeMax: 150,
-    availablePatterns: ["topBottom", "triple", "triple", "edgeTrap", "edgeTrap"],
+    availablePatterns: [
+      "topBottom",
+      "triple",
+      "triple",
+      "edgeTrap",
+      "edgeTrap",
+    ],
   },
 ] as const;
