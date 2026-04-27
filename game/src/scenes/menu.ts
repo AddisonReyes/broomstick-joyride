@@ -1,4 +1,5 @@
 import "kaplay/global";
+import { scaleUi } from "../layout.js";
 import type { PlayerSceneData } from "../types.js";
 import {
   addArcaneButton,
@@ -14,13 +15,17 @@ export default function menuScene(): void {
     addArcaneNightBackdrop("Made by Dakotitah");
     addTitleBlock(palette);
 
-    addArcaneButton("Play", vec2(width() / 2, height() / 2 - 32), () => {
-      go("game", { username });
-    });
+    addArcaneButton(
+      "Play",
+      vec2(width() / 2, height() / 2 - scaleUi(32)),
+      () => {
+        go("game", { username });
+      },
+    );
 
     addArcaneButton(
       "Username",
-      vec2(width() / 2, height() / 2 + 72),
+      vec2(width() / 2, height() / 2 + scaleUi(72)),
       () => {
         go("user", { username });
       },
@@ -29,7 +34,7 @@ export default function menuScene(): void {
 
     addArcaneButton(
       "Leaderboard",
-      vec2(width() / 2, height() / 2 + 176),
+      vec2(width() / 2, height() / 2 + scaleUi(176)),
       () => {
         go("leaderboard", { username });
       },
@@ -39,8 +44,8 @@ export default function menuScene(): void {
 
 function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   add([
-    text("Broomstick", { size: 38 }),
-    pos(width() / 2, 98),
+    text("Broomstick", { size: scaleUi(38) }),
+    pos(width() / 2, scaleUi(98)),
     anchor("center"),
     color(palette.goldGlow),
     fixed(),
@@ -48,8 +53,8 @@ function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   ]);
 
   add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 162),
+    text("Joyride", { size: scaleUi(82) }),
+    pos(width() / 2, scaleUi(162)),
     anchor("center"),
     color(palette.inkBlack),
     opacity(0.55),
@@ -58,8 +63,8 @@ function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   ]);
 
   add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 154),
+    text("Joyride", { size: scaleUi(82) }),
+    pos(width() / 2, scaleUi(154)),
     anchor("center"),
     color(palette.parchment),
     fixed(),
@@ -67,8 +72,8 @@ function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   ]);
 
   const glowTitle = add([
-    text("Joyride", { size: 82 }),
-    pos(width() / 2, 154),
+    text("Joyride", { size: scaleUi(82) }),
+    pos(width() / 2, scaleUi(154)),
     anchor("center"),
     color(palette.arcaneGlow),
     opacity(0.18),
@@ -81,8 +86,8 @@ function addTitleBlock(palette: ReturnType<typeof getArcanePalette>): void {
   });
 
   add([
-    text("Dash through the enchanted night", { size: 16 }),
-    pos(width() / 2, 222),
+    text("Dash through the enchanted night", { size: scaleUi(16) }),
+    pos(width() / 2, scaleUi(222)),
     anchor("center"),
     color(palette.titleBlue),
     fixed(),

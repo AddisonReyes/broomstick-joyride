@@ -1,5 +1,6 @@
 import "kaplay/global";
 import { leaderboardSettings, uiText } from "../constants.js";
+import { scaleUi } from "../layout.js";
 import { getEntries } from "../services/leaderboard.js";
 import type { LeaderboardEntry, PlayerSceneData } from "../types.js";
 import { convertDistance } from "../utils.js";
@@ -13,14 +14,14 @@ import {
 export default function leaderboardScene(): void {
   scene("leaderboard", ({ username }: PlayerSceneData) => {
     const palette = getArcanePalette();
-    const panelCenter = vec2(width() / 2, height() / 2 + 12);
-    const panelSize = vec2(760, 470);
+    const panelCenter = vec2(width() / 2, height() / 2 + scaleUi(12));
+    const panelSize = vec2(scaleUi(760), scaleUi(470));
     const panelTop = panelCenter.y - panelSize.y / 2;
-    const tableWidth = 560;
+    const tableWidth = scaleUi(560);
     const tableCenterX = width() / 2;
     const tableLeft = tableCenterX - tableWidth / 2;
-    const rowHorizontalPadding = 18;
-    const rankColumnWidth = 76;
+    const rowHorizontalPadding = scaleUi(18);
+    const rankColumnWidth = scaleUi(76);
     const riderColumnLeft = tableLeft + rowHorizontalPadding + rankColumnWidth;
     const rankColumnLeft = tableLeft + rowHorizontalPadding;
     const scoreColumnRight = tableLeft + tableWidth - rowHorizontalPadding;
@@ -29,8 +30,8 @@ export default function leaderboardScene(): void {
     addArcanePanel(panelCenter, panelSize, 10);
 
     add([
-      text("Leaderboard", { size: 64 }),
-      pos(width() / 2, 88),
+      text("Leaderboard", { size: scaleUi(64) }),
+      pos(width() / 2, scaleUi(88)),
       anchor("center"),
       color(palette.goldGlow),
       fixed(),
@@ -38,18 +39,18 @@ export default function leaderboardScene(): void {
     ]);
 
     add([
-      text("Top broom riders under the midnight moon", { size: 16 }),
-      pos(width() / 2, 130),
+      text("Top broom riders under the midnight moon", { size: scaleUi(16) }),
+      pos(width() / 2, scaleUi(130)),
       anchor("center"),
       color(palette.titleBlue),
       fixed(),
       z(12),
     ]);
 
-    const tableTop = panelTop + 62;
-    const rowHeight = 34;
+    const tableTop = panelTop + scaleUi(62);
+    const rowHeight = scaleUi(34);
     const firstRowOffset = rowHeight;
-    const rowWidth = tableWidth - 18;
+    const rowWidth = tableWidth - scaleUi(18);
     const rowCenterX = tableCenterX;
 
     addTableHeader("Rank", rankColumnLeft, tableTop, "left");
@@ -62,8 +63,8 @@ export default function leaderboardScene(): void {
     let leaderboardAvailable = true;
 
     const pageIndicator = add([
-      text(uiText.leaderboardLoading, { size: 16 }),
-      pos(width() / 2, height() - 146),
+      text(uiText.leaderboardLoading, { size: scaleUi(16) }),
+      pos(width() / 2, height() - scaleUi(146)),
       anchor("center"),
       color(palette.footerBlue),
       fixed(),
@@ -71,8 +72,8 @@ export default function leaderboardScene(): void {
     ]);
 
     const statusMessage = add([
-      text("", { size: 16, width: 520, align: "center" }),
-      pos(width() / 2, panelCenter.y + 36),
+      text("", { size: scaleUi(16), width: scaleUi(520), align: "center" }),
+      pos(width() / 2, panelCenter.y + scaleUi(36)),
       anchor("center"),
       color(palette.parchment),
       fixed(),
@@ -81,7 +82,7 @@ export default function leaderboardScene(): void {
 
     addArcaneButton(
       "Back",
-      vec2(width() / 2 - 210, height() - 82),
+      vec2(width() / 2 - scaleUi(210), height() - scaleUi(82)),
       () => {
         go("menu", { username });
       },
@@ -91,7 +92,7 @@ export default function leaderboardScene(): void {
 
     addArcaneButton(
       "Prev",
-      vec2(width() / 2, height() - 82),
+      vec2(width() / 2, height() - scaleUi(82)),
       () => {
         if (leaderboardAvailable && currentPage > 0) {
           currentPage--;
@@ -104,7 +105,7 @@ export default function leaderboardScene(): void {
 
     addArcaneButton(
       "Next",
-      vec2(width() / 2 + 210, height() - 82),
+      vec2(width() / 2 + scaleUi(210), height() - scaleUi(82)),
       () => {
         if (leaderboardAvailable && currentPage < totalPages - 1) {
           currentPage++;
@@ -187,7 +188,7 @@ export default function leaderboardScene(): void {
         const isCurrentPlayer = entry.username === username;
 
         add([
-          rect(rowWidth, 26, { radius: 10 }),
+          rect(rowWidth, scaleUi(26), { radius: scaleUi(10) }),
           pos(rowCenterX, rowY),
           anchor("center"),
           color(isCurrentPlayer ? palette.arcaneBlue : palette.buttonBase),
@@ -247,7 +248,7 @@ export default function leaderboardScene(): void {
       align: "left" | "right",
     ): void {
       add([
-        text(textValue, { size: 16 }),
+        text(textValue, { size: scaleUi(16) }),
         pos(x, y),
         anchor(align),
         color(palette.goldGlow),
@@ -263,7 +264,7 @@ export default function leaderboardScene(): void {
       align: "left" | "center" | "right" = "center",
     ): void {
       const displayText = add([
-        text(textValue, { size: 16 }),
+        text(textValue, { size: scaleUi(16) }),
         pos(position),
         anchor(
           align === "left" ? "left" : align === "right" ? "right" : "center",

@@ -1,4 +1,5 @@
 import "kaplay/global";
+import { scaleUi } from "../layout.js";
 
 type ArcaneAction = () => void;
 type Vector2 = ReturnType<typeof vec2>;
@@ -29,6 +30,8 @@ export function getArcanePalette() {
 
 export function addArcaneNightBackdrop(footerText: string = ""): void {
   const palette = getArcanePalette();
+  const moonOffsetX = scaleUi(160);
+  const moonOffsetY = scaleUi(120);
 
   add([
     rect(width(), height()),
@@ -39,8 +42,8 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    circle(96),
-    pos(width() - 160, 120),
+    circle(scaleUi(96)),
+    pos(width() - moonOffsetX, moonOffsetY),
     color(palette.moonColor),
     opacity(0.95),
     fixed(),
@@ -48,8 +51,8 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    circle(124),
-    pos(width() - 160, 120),
+    circle(scaleUi(124)),
+    pos(width() - moonOffsetX, moonOffsetY),
     color(palette.goldGlow),
     opacity(0.12),
     fixed(),
@@ -57,8 +60,8 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    rect(width() * 0.82, 220, { radius: 28 }),
-    pos(width() * 0.1, height() - 220),
+    rect(width() * 0.82, scaleUi(220), { radius: scaleUi(28) }),
+    pos(width() * 0.1, height() - scaleUi(220)),
     color(palette.mistBlue),
     opacity(0.28),
     rotate(-4),
@@ -67,8 +70,8 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    rect(width() * 0.68, 180, { radius: 24 }),
-    pos(width() * 0.38, height() - 160),
+    rect(width() * 0.68, scaleUi(180), { radius: scaleUi(24) }),
+    pos(width() * 0.38, height() - scaleUi(160)),
     color(palette.arcaneBlue),
     opacity(0.14),
     rotate(5),
@@ -77,7 +80,7 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    rect(170, height() * 0.55),
+    rect(scaleUi(170), height() * 0.55),
     pos(width() * 0.08, height() * 0.45),
     color(palette.inkBlack),
     opacity(0.65),
@@ -86,7 +89,7 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   ]);
 
   add([
-    rect(120, height() * 0.42),
+    rect(scaleUi(120), height() * 0.42),
     pos(width() * 0.78, height() * 0.58),
     color(palette.inkBlack),
     opacity(0.58),
@@ -97,7 +100,10 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
   for (let index = 0; index < 20; index++) {
     const star = add([
       circle(rand(1, 2.6)),
-      pos(rand(48, width() - 48), rand(32, height() * 0.5)),
+      pos(
+        rand(scaleUi(48), width() - scaleUi(48)),
+        rand(scaleUi(32), height() * 0.5),
+      ),
       color(index % 3 === 0 ? palette.goldGlow : palette.parchment),
       opacity(rand(0.45, 0.95)),
       fixed(),
@@ -114,8 +120,8 @@ export function addArcaneNightBackdrop(footerText: string = ""): void {
 
   if (footerText) {
     add([
-      text(footerText, { size: 16 }),
-      pos(width() / 2, height() - 42),
+      text(footerText, { size: scaleUi(16) }),
+      pos(width() / 2, height() - scaleUi(42)),
       anchor("center"),
       color(palette.footerBlue),
       opacity(0.72),
@@ -131,12 +137,16 @@ export function addArcanePanel(
   layer = 10,
 ) {
   const palette = getArcanePalette();
+  const outlineWidth = scaleUi(4);
+  const outerRadius = scaleUi(22);
+  const innerPadding = scaleUi(26);
+  const innerRadius = scaleUi(18);
 
   const panel = add([
-    rect(panelSize.x, panelSize.y, { radius: 22 }),
+    rect(panelSize.x, panelSize.y, { radius: outerRadius }),
     pos(center),
     anchor("center"),
-    outline(4, palette.buttonOutline),
+    outline(outlineWidth, palette.buttonOutline),
     color(palette.buttonBase),
     opacity(0.94),
     fixed(),
@@ -144,7 +154,9 @@ export function addArcanePanel(
   ]);
 
   panel.add([
-    rect(panelSize.x - 26, panelSize.y - 26, { radius: 18 }),
+    rect(panelSize.x - innerPadding, panelSize.y - innerPadding, {
+      radius: innerRadius,
+    }),
     anchor("center"),
     color(palette.panelInner),
     opacity(0.88),
@@ -162,17 +174,25 @@ export function addArcaneButton(
   layer = 20,
 ) {
   const palette = getArcanePalette();
-  const glyphX = -(widthPx / 2) + 34;
-  const labelCenterX = 12;
-  const labelCenterY = 2;
+  const buttonWidth = scaleUi(widthPx);
+  const buttonHeight = scaleUi(76);
+  const buttonRadius = scaleUi(16);
+  const outlineWidth = scaleUi(4);
+  const innerInsetX = scaleUi(24);
+  const innerHeight = scaleUi(52);
+  const innerRadius = scaleUi(12);
+  const glyphRadius = scaleUi(12);
+  const glyphX = -(buttonWidth / 2) + scaleUi(34);
+  const labelCenterX = scaleUi(12);
+  const labelCenterY = scaleUi(2);
 
   const button = add([
-    rect(widthPx, 76, { radius: 16 }),
+    rect(buttonWidth, buttonHeight, { radius: buttonRadius }),
     pos(buttonCenter),
     anchor("center"),
     area(),
     scale(1),
-    outline(4, palette.buttonOutline),
+    outline(outlineWidth, palette.buttonOutline),
     color(palette.buttonBase),
     opacity(0.96),
     fixed(),
@@ -180,14 +200,14 @@ export function addArcaneButton(
   ]);
 
   const innerGlow = button.add([
-    rect(widthPx - 24, 52, { radius: 12 }),
+    rect(buttonWidth - innerInsetX, innerHeight, { radius: innerRadius }),
     anchor("center"),
     color(palette.buttonGlow),
     opacity(0.68),
   ]);
 
   const glyph = button.add([
-    circle(12),
+    circle(glyphRadius),
     pos(glyphX, 0),
     anchor("center"),
     scale(1),
@@ -196,15 +216,15 @@ export function addArcaneButton(
   ]);
 
   const labelText = button.add([
-    text(label, { size: 32 }),
+    text(label, { size: scaleUi(32) }),
     pos(labelCenterX, labelCenterY),
     anchor("center"),
     color(palette.parchment),
   ]);
 
   const descriptionText = add([
-    text(description, { size: 16, width: 220 }),
-    pos(buttonCenter.x + widthPx / 2 + 28, buttonCenter.y),
+    text(description, { size: scaleUi(16), width: scaleUi(220) }),
+    pos(buttonCenter.x + buttonWidth / 2 + scaleUi(28), buttonCenter.y),
     anchor("left"),
     color(palette.descriptionBlue),
     opacity(description ? 0.65 : 0),

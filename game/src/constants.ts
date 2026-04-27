@@ -10,7 +10,7 @@ export const uiText = {
 
 export const viewport = {
   width: 1980,
-  height: 1020,
+  height: 1080,
 } as const;
 
 export const obstacleColors = [

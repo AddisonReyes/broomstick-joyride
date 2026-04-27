@@ -4,6 +4,7 @@ import {
   gameSettings,
   obstacleColors,
 } from "../constants.js";
+import { getViewportScale, scaleUi } from "../layout.js";
 import type { PlayerSceneData } from "../types.js";
 import { convertDistance, hexToColor } from "../utils.js";
 import {
@@ -27,26 +28,28 @@ const bandRatios: Record<VerticalBand, number> = {
 export default function gameScene(): void {
   scene("game", ({ username }: PlayerSceneData) => {
     const palette = getArcanePalette();
+    const viewportScale = getViewportScale();
+    const scaledSettings = getScaledGameSettings(viewportScale);
 
     addArcaneNightBackdrop();
 
     const player = add([
       sprite("player"),
-      pos(gameSettings.playerStartX, height() / 2),
+      pos(scaledSettings.playerStartX, height() / 2),
       area(),
       body(),
     ]);
 
-    let worldSpeed: number = gameSettings.initialWorldSpeed;
+    let worldSpeed: number = scaledSettings.initialWorldSpeed;
     let lastSingleBand: VerticalBand = "center";
     let paused = false;
     let score = 0;
 
     add([
-      rect(256, 64, { radius: 18 }),
-      pos(width() / 2, 52),
+      rect(scaleUi(256), scaleUi(64), { radius: scaleUi(18) }),
+      pos(width() / 2, scaleUi(52)),
       anchor("center"),
-      outline(4, palette.buttonOutline),
+      outline(scaleUi(4), palette.buttonOutline),
       color(palette.buttonBase),
       opacity(0.94),
       fixed(),
@@ -54,8 +57,8 @@ export default function gameScene(): void {
     ]);
 
     const scoreLabel = add([
-      text(`${convertDistance(score)}m`, { size: 32 }),
-      pos(width() / 2, 54),
+      text(`${convertDistance(score)}m`, { size: scaleUi(32) }),
+      pos(width() / 2, scaleUi(54)),
       anchor("center"),
       color(palette.parchment),
       fixed(),
@@ -63,14 +66,14 @@ export default function gameScene(): void {
     ]);
 
     const pausePanel = addArcanePanel(
-      vec2(width() / 2, height() / 2 - 18),
-      vec2(430, 300),
+      vec2(width() / 2, height() / 2 - scaleUi(18)),
+      vec2(scaleUi(430), scaleUi(300)),
       40,
     );
 
     const pauseTitle = add([
-      text("Paused", { size: 32 }),
-      pos(width() / 2, height() / 2 - 104),
+      text("Paused", { size: scaleUi(32) }),
+      pos(width() / 2, height() / 2 - scaleUi(104)),
       anchor("center"),
       color(palette.goldGlow),
       fixed(),
@@ -79,7 +82,7 @@ export default function gameScene(): void {
 
     const continueButton = addArcaneButton(
       "Continue",
-      vec2(width() / 2, height() / 2 - 32),
+      vec2(width() / 2, height() / 2 - scaleUi(32)),
       () => {
         if (paused) {
           togglePauseMenu();
@@ -92,7 +95,7 @@ export default function gameScene(): void {
 
     const exitButton = addArcaneButton(
       "Exit",
-      vec2(width() / 2, height() / 2 + 64),
+      vec2(width() / 2, height() / 2 + scaleUi(64)),
       () => {
         if (paused) {
           go("lose", { username, score });
@@ -104,13 +107,13 @@ export default function gameScene(): void {
     );
 
     addBorder(0);
-    addBorder(height() - gameSettings.borderHeight);
+    addBorder(height() - scaledSettings.borderHeight);
     setPauseOverlayVisible(false);
     scheduleNextWave();
 
     player.onUpdate(() => {
       if (!paused) {
-        player.pos.y += gameSettings.playerFallSpeed;
+        player.pos.y += scaledSettings.playerFallSpeed;
       }
     });
 
@@ -123,7 +126,7 @@ export default function gameScene(): void {
         object.pos.x -= worldSpeed * dt();
       }
 
-      if (object.pos.x < gameSettings.obstacleDestroyX) {
+      if (object.pos.x < scaledSettings.obstacleDestroyX) {
         object.destroy();
       }
     });
@@ -133,22 +136,25 @@ export default function gameScene(): void {
         return;
       }
 
-      const difficultyStage = getDifficultyStage(score);
+      const difficultyStage = getScaledDifficultyStage(score, viewportScale);
 
       worldSpeed = moveToward(
         worldSpeed,
         difficultyStage.targetWorldSpeed,
-        gameSettings.speedLerpPerSecond * dt(),
+        scaledSettings.speedLerpPerSecond * dt(),
       );
 
-      const scoreRate = getScoreRate(worldSpeed);
+      const scoreRate = getScoreRate(
+        worldSpeed,
+        scaledSettings.initialWorldSpeed,
+      );
       score += scoreRate * dt();
       scoreLabel.text = `${convertDistance(score)}m`;
     });
 
     onKeyDown("space", () => {
       if (!paused) {
-        player.pos.y -= gameSettings.playerLiftSpeed;
+        player.pos.y -= scaledSettings.playerLiftSpeed;
       }
     });
 
@@ -167,7 +173,7 @@ export default function gameScene(): void {
     }
 
     function scheduleNextWave(): void {
-      const difficultyStage = getDifficultyStage(score);
+      const difficultyStage = getScaledDifficultyStage(score, viewportScale);
       const delay = rand(
         difficultyStage.spawnDelayMin,
         difficultyStage.spawnDelayMax,
@@ -185,8 +191,8 @@ export default function gameScene(): void {
     function spawnWave(difficultyStage: DifficultyStage): void {
       const pattern = choose([...difficultyStage.availablePatterns]);
       const spawnX = rand(
-        width() + gameSettings.obstacleSpawnMinOffsetX,
-        width() + gameSettings.obstacleSpawnMaxOffsetX,
+        width() + scaledSettings.obstacleSpawnMinOffsetX,
+        width() + scaledSettings.obstacleSpawnMaxOffsetX,
       );
 
       switch (pattern) {
@@ -223,7 +229,7 @@ export default function gameScene(): void {
     ): void {
       createObstacle(spawnX, bandCenterY("upperMid"), difficultyStage);
       createObstacle(
-        spawnX + gameSettings.obstaclePairSpacingX,
+        spawnX + scaledSettings.obstaclePairSpacingX,
         bandCenterY("lowerMid"),
         difficultyStage,
       );
@@ -243,12 +249,12 @@ export default function gameScene(): void {
     ): void {
       createObstacle(spawnX, bandCenterY("top"), difficultyStage);
       createObstacle(
-        spawnX + gameSettings.obstacleTripleSpacingX,
+        spawnX + scaledSettings.obstacleTripleSpacingX,
         bandCenterY("center"),
         difficultyStage,
       );
       createObstacle(
-        spawnX + gameSettings.obstacleTripleSpacingX * 2,
+        spawnX + scaledSettings.obstacleTripleSpacingX * 2,
         bandCenterY("bottom"),
         difficultyStage,
       );
@@ -266,12 +272,12 @@ export default function gameScene(): void {
 
       createObstacle(spawnX, bandCenterY(firstEdgeBand), difficultyStage);
       createObstacle(
-        spawnX + gameSettings.obstaclePairSpacingX,
+        spawnX + scaledSettings.obstaclePairSpacingX,
         bandCenterY(oppositeEdgeBand),
         difficultyStage,
       );
       createObstacle(
-        spawnX + gameSettings.obstacleTripleSpacingX,
+        spawnX + scaledSettings.obstacleTripleSpacingX,
         bandCenterY(centerPressureBand),
         difficultyStage,
       );
@@ -297,7 +303,7 @@ export default function gameScene(): void {
         pos(spawnX, spawnY),
         area(),
         rotate(rand(0, 180)),
-        outline(4),
+        outline(scaleUi(4)),
         anchor("center"),
         hexToColor(obstacleColor) ?? color(255, 255, 255),
         z(-1),
@@ -323,20 +329,20 @@ export default function gameScene(): void {
 
     function laneCenterY(positionRatio: number): number {
       const topLimit =
-        gameSettings.borderHeight + gameSettings.obstacleVerticalGapPadding;
+        scaledSettings.borderHeight + scaledSettings.obstacleVerticalGapPadding;
       const bottomLimit =
         height() -
-        gameSettings.borderHeight -
-        gameSettings.obstacleVerticalGapPadding;
+        scaledSettings.borderHeight -
+        scaledSettings.obstacleVerticalGapPadding;
 
       return lerp(topLimit, bottomLimit, positionRatio);
     }
 
     function addBorder(y: number): void {
       add([
-        rect(width(), gameSettings.borderHeight),
+        rect(width(), scaledSettings.borderHeight),
         pos(0, y),
-        outline(4),
+        outline(scaleUi(4)),
         area(),
         body({ isStatic: true }),
         color(palette.nightBlue),
@@ -371,10 +377,54 @@ function getDifficultyStage(score: number): DifficultyStage {
   return difficultyStages[0];
 }
 
-function getScoreRate(targetWorldSpeed: number): number {
+function getScaledDifficultyStage(
+  score: number,
+  scaleFactor: number,
+): DifficultyStage {
+  const difficultyStage = getDifficultyStage(score);
+
+  return {
+    ...difficultyStage,
+    targetWorldSpeed: difficultyStage.targetWorldSpeed * scaleFactor,
+    obstacleSizeMin: Math.round(difficultyStage.obstacleSizeMin * scaleFactor),
+    obstacleSizeMax: Math.round(difficultyStage.obstacleSizeMax * scaleFactor),
+  };
+}
+
+function getScaledGameSettings(scaleFactor: number) {
+  return {
+    playerStartX: Math.round(gameSettings.playerStartX * scaleFactor),
+    playerFallSpeed: gameSettings.playerFallSpeed * scaleFactor,
+    playerLiftSpeed: gameSettings.playerLiftSpeed * scaleFactor,
+    initialWorldSpeed: gameSettings.initialWorldSpeed * scaleFactor,
+    speedLerpPerSecond: gameSettings.speedLerpPerSecond * scaleFactor,
+    borderHeight: Math.round(gameSettings.borderHeight * scaleFactor),
+    obstacleSpawnMinOffsetX: Math.round(
+      gameSettings.obstacleSpawnMinOffsetX * scaleFactor,
+    ),
+    obstacleSpawnMaxOffsetX: Math.round(
+      gameSettings.obstacleSpawnMaxOffsetX * scaleFactor,
+    ),
+    obstacleVerticalGapPadding: Math.round(
+      gameSettings.obstacleVerticalGapPadding * scaleFactor,
+    ),
+    obstacleDestroyX: Math.round(gameSettings.obstacleDestroyX * scaleFactor),
+    obstaclePairSpacingX: Math.round(
+      gameSettings.obstaclePairSpacingX * scaleFactor,
+    ),
+    obstacleTripleSpacingX: Math.round(
+      gameSettings.obstacleTripleSpacingX * scaleFactor,
+    ),
+  };
+}
+
+function getScoreRate(
+  targetWorldSpeed: number,
+  initialWorldSpeed: number,
+): number {
   return (
     gameSettings.scorePerSecondAtBaseSpeed *
-    (targetWorldSpeed / gameSettings.initialWorldSpeed)
+    (targetWorldSpeed / initialWorldSpeed)
   );
 }
 

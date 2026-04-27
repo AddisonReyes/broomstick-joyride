@@ -1,5 +1,6 @@
 import "kaplay/global";
 import { uiText } from "../constants.js";
+import { scaleUi } from "../layout.js";
 import type { PlayerSceneData } from "../types.js";
 import {
   addArcaneButton,
@@ -13,11 +14,15 @@ export default function userScene(): void {
     const palette = getArcanePalette();
 
     addArcaneNightBackdrop();
-    addArcanePanel(vec2(width() / 2, height() / 2), vec2(620, 360), 10);
+    addArcanePanel(
+      vec2(width() / 2, height() / 2),
+      vec2(scaleUi(620), scaleUi(360)),
+      10,
+    );
 
     add([
-      text("Witch Name", { size: 32 }),
-      pos(width() / 2, 118),
+      text("Witch Name", { size: scaleUi(32) }),
+      pos(width() / 2, scaleUi(118)),
       anchor("center"),
       color(palette.goldGlow),
       fixed(),
@@ -25,8 +30,12 @@ export default function userScene(): void {
     ]);
 
     const titleLabel = add([
-      text(uiText.usernamePrompt, { size: 16, width: 460, align: "center" }),
-      pos(width() / 2, 176),
+      text(uiText.usernamePrompt, {
+        size: scaleUi(16),
+        width: scaleUi(460),
+        align: "center",
+      }),
+      pos(width() / 2, scaleUi(176)),
       anchor("center"),
       color(palette.titleBlue),
       fixed(),
@@ -34,17 +43,17 @@ export default function userScene(): void {
     ]);
 
     add([
-      rect(420, 74, { radius: 16 }),
+      rect(scaleUi(420), scaleUi(74), { radius: scaleUi(16) }),
       pos(width() / 2, height() / 2),
       anchor("center"),
-      outline(4, palette.buttonOutline),
+      outline(scaleUi(4), palette.buttonOutline),
       color(palette.buttonBase),
       fixed(),
       z(11),
     ]);
 
     add([
-      rect(392, 48, { radius: 12 }),
+      rect(scaleUi(392), scaleUi(48), { radius: scaleUi(12) }),
       pos(width() / 2, height() / 2),
       anchor("center"),
       color(palette.buttonGlow),
@@ -64,8 +73,12 @@ export default function userScene(): void {
     ]);
 
     const enterLabel = add([
-      text(uiText.usernameIdle, { size: 16, width: 420, align: "center" }),
-      pos(width() / 2, height() / 2 + 72),
+      text(uiText.usernameIdle, {
+        size: scaleUi(16),
+        width: scaleUi(420),
+        align: "center",
+      }),
+      pos(width() / 2, height() / 2 + scaleUi(72)),
       anchor("center"),
       color(palette.descriptionBlue),
       fixed(),

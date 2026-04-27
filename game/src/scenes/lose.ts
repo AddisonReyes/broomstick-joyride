@@ -1,5 +1,6 @@
 import "kaplay/global";
 import { postEntry } from "../services/leaderboard.js";
+import { scaleUi } from "../layout.js";
 import type { LoseSceneData } from "../types.js";
 import { convertDistance } from "../utils.js";
 import {
@@ -14,12 +15,16 @@ export default function loseScene(): void {
     const palette = getArcanePalette();
 
     addArcaneNightBackdrop();
-    addArcanePanel(vec2(width() / 2, height() / 2 - 12), vec2(640, 430), 10);
+    addArcanePanel(
+      vec2(width() / 2, height() / 2 - scaleUi(12)),
+      vec2(scaleUi(640), scaleUi(430)),
+      10,
+    );
 
     add([
       sprite("player"),
-      pos(width() / 2, 160),
-      scale(2.3),
+      pos(width() / 2, scaleUi(160)),
+      scale((2.3 * scaleUi(100)) / 100),
       rotate(18),
       anchor("center"),
       fixed(),
@@ -27,18 +32,18 @@ export default function loseScene(): void {
     ]);
 
     add([
-      rect(280, 92, { radius: 20 }),
-      pos(width() / 2, 314),
+      rect(scaleUi(280), scaleUi(92), { radius: scaleUi(20) }),
+      pos(width() / 2, scaleUi(314)),
       anchor("center"),
-      outline(4, palette.buttonOutline),
+      outline(scaleUi(4), palette.buttonOutline),
       color(palette.buttonBase),
       fixed(),
       z(11),
     ]);
 
     add([
-      text("Final Distance", { size: 16 }),
-      pos(width() / 2, 286),
+      text("Final Distance", { size: scaleUi(16) }),
+      pos(width() / 2, scaleUi(286)),
       anchor("center"),
       color(palette.footerBlue),
       fixed(),
@@ -46,8 +51,8 @@ export default function loseScene(): void {
     ]);
 
     add([
-      text(`${convertDistance(score)}m`, { size: 32 }),
-      pos(width() / 2, 322),
+      text(`${convertDistance(score)}m`, { size: scaleUi(32) }),
+      pos(width() / 2, scaleUi(322)),
       anchor("center"),
       color(palette.parchment),
       fixed(),
@@ -55,21 +60,25 @@ export default function loseScene(): void {
     ]);
 
     const statusLabel = add([
-      text("", { size: 16, width: 360 }),
-      pos(width() / 2 - 144, height() / 2 + 240),
+      text("", { size: scaleUi(16), width: scaleUi(360) }),
+      pos(width() / 2 - scaleUi(144), height() / 2 + scaleUi(240)),
       anchor("left"),
       color(palette.descriptionBlue),
       fixed(),
       z(12),
     ]);
 
-    addArcaneButton("Play Again", vec2(width() / 2, height() / 2 - 48), () => {
-      go("game", { username });
-    });
+    addArcaneButton(
+      "Play Again",
+      vec2(width() / 2, height() / 2 - scaleUi(48)),
+      () => {
+        go("game", { username });
+      },
+    );
 
     addArcaneButton(
       "Submit Score",
-      vec2(width() / 2, height() / 2 + 40),
+      vec2(width() / 2, height() / 2 + scaleUi(40)),
       async () => {
         statusLabel.text = "Submitting score...";
         statusLabel.color = palette.arcaneGlow;
@@ -84,8 +93,12 @@ export default function loseScene(): void {
       },
     );
 
-    addArcaneButton("Main Menu", vec2(width() / 2, height() / 2 + 128), () => {
-      go("menu", { username });
-    });
+    addArcaneButton(
+      "Main Menu",
+      vec2(width() / 2, height() / 2 + scaleUi(128)),
+      () => {
+        go("menu", { username });
+      },
+    );
   });
 }
