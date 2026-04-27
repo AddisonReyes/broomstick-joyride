@@ -2,6 +2,8 @@ import "kaplay/global";
 
 type RgbTuple = [number, number, number];
 
+const usernameStorageKey = "broomstick-joyride.username";
+
 export function hexToRgb(
   hex: string,
 ): RgbTuple | null {
@@ -39,4 +41,39 @@ export function hexToColor(hex: string): ReturnType<typeof color> | null {
 export function convertDistance(distance: number): string {
   const roundedDistance = Math.round(distance);
   return roundedDistance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function getStoredUsername(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedUsername = window.localStorage.getItem(usernameStorageKey);
+    const normalizedUsername = normalizeUsername(storedUsername ?? "");
+
+    return normalizedUsername === "" ? null : normalizedUsername;
+  } catch {
+    return null;
+  }
+}
+
+export function storeUsername(username: string): string {
+  const normalizedUsername = normalizeUsername(username);
+
+  if (normalizedUsername === "" || typeof window === "undefined") {
+    return normalizedUsername;
+  }
+
+  try {
+    window.localStorage.setItem(usernameStorageKey, normalizedUsername);
+  } catch {
+    return normalizedUsername;
+  }
+
+  return normalizedUsername;
+}
+
+function normalizeUsername(username: string): string {
+  return username.trim();
 }

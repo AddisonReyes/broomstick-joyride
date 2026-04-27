@@ -2,6 +2,7 @@ import "kaplay/global";
 import { uiText } from "../constants.js";
 import { scaleUi } from "../layout.js";
 import type { PlayerSceneData } from "../types.js";
+import { storeUsername } from "../utils.js";
 import {
   addArcaneButton,
   addArcaneNightBackdrop,
@@ -101,8 +102,10 @@ export default function userScene(): void {
     });
 
     onKeyPress("enter", () => {
-      if (usernameInput.text.trim() !== "") {
-        go("menu", { username: usernameInput.text.trim() });
+      const username = storeUsername(usernameInput.text);
+
+      if (username !== "") {
+        go("menu", { username });
       }
     });
   });

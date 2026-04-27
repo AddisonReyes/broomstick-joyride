@@ -6,7 +6,7 @@ import loseScene from "./scenes/lose.js";
 import menuScene from "./scenes/menu.js";
 import userScene from "./scenes/user.js";
 import { viewport } from "./constants.js";
-import { hexToRgb } from "./utils.js";
+import { getStoredUsername, hexToRgb } from "./utils.js";
 
 bootGame();
 
@@ -24,7 +24,15 @@ function bootGame(): void {
 
   loadAssets();
   registerScenes();
-  go("game", { username: "Dako" });
+
+  const storedUsername = getStoredUsername();
+
+  if (storedUsername) {
+    go("menu", { username: storedUsername });
+    return;
+  }
+
+  go("user", { username: "" });
 }
 
 function loadAssets(): void {

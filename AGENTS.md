@@ -5,18 +5,21 @@
 This repository contains two related apps:
 
 - `game/`: a browser game built with Vite and Kaplay.
-- `services/leaderboard/`: an Express + TypeScript + MongoDB leaderboard API.
+- `backend/`: an Express + TypeScript + MongoDB leaderboard API.
 
 Keep changes scoped to the part of the repo you are working in, and preserve the existing gameplay and API behavior unless the task explicitly requires a behavior change.
 
 ## Repo Map
 
-- `game/src/main.js`: game bootstrap, asset loading, and scene registration.
-- `game/src/scenes/`: gameplay and menu scenes.
-- `game/src/utils.js`: shared helpers for UI, formatting, and leaderboard requests.
-- `services/leaderboard/src/index.ts`: API entrypoint and route definitions.
-- `services/leaderboard/src/models/entry.ts`: Mongoose schema and model.
-- `services/docker-compose.yaml`: local container setup for the leaderboard service.
+- `game/src/main.ts`: game bootstrap, asset loading, and scene registration.
+- `game/src/scenes/game.ts`: gameplay scene orchestration and obstacle creation.
+- `game/src/scenes/gameplay.ts`: gameplay helpers for difficulty scaling, wave patterns, and vertical band placement.
+- `game/src/scenes/`: menu, username, lose, leaderboard, and gameplay scenes.
+- `game/src/services/leaderboard.ts`: leaderboard requests and response normalization.
+- `game/src/ui/arcane.ts`: shared UI palette and arcane UI helpers.
+- `backend/src/index.ts`: API entrypoint and route definitions.
+- `backend/src/models/entry.ts`: Mongoose schema and model.
+- `backend/docker-compose.yaml`: local container setup for the leaderboard service.
 
 ## Run Commands
 
@@ -38,7 +41,7 @@ npm run build
 Leaderboard service:
 
 ```sh
-cd services/leaderboard
+cd backend
 npm install
 npm run build
 npm run start
@@ -93,6 +96,7 @@ Before finishing:
 
 ## Notes For Future Agents
 
-- The current game bootstrap starts directly in the game scene with a hardcoded username in `game/src/main.js`; do not assume the menu flow is the active entry path.
-- The leaderboard client currently talks to a deployed Railway endpoint from `game/src/utils.js`.
-- There may be generated output under `services/leaderboard/dist/`; prefer editing source files under `src/`.
+- The current game bootstrap checks browser `localStorage` first. It opens `menu` when a cached username exists, otherwise it starts in the username scene from `game/src/main.ts`.
+- Obstacle spawn patterns and vertical band placement live in `game/src/scenes/gameplay.ts`.
+- The leaderboard client currently talks to a deployed Railway endpoint from `game/src/config.ts` via `game/src/services/leaderboard.ts`.
+- There may be generated output under `backend/dist/`; prefer editing source files under `backend/src/`.
