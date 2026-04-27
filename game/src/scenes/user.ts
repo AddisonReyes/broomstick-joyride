@@ -21,7 +21,7 @@ export default function userScene(): void {
     );
 
     add([
-      text("Witch Name", { size: scaleUi(32) }),
+      text("Username", { size: scaleUi(32) }),
       pos(width() / 2, scaleUi(118)),
       anchor("center"),
       color(palette.goldGlow),

@@ -5,13 +5,18 @@ import leaderboardScene from "./scenes/leaderboard.js";
 import loseScene from "./scenes/lose.js";
 import menuScene from "./scenes/menu.js";
 import userScene from "./scenes/user.js";
+import { viewport } from "./constants.js";
 import { hexToRgb } from "./utils.js";
 
 bootGame();
 
 function bootGame(): void {
   kaplay({
-    background: hexToRgb("#0e1128") ?? [36, 34, 52],
+    width: viewport.width,
+    height: viewport.height,
+    stretch: true,
+    letterbox: true,
+    background: hexToRgb("#0e1128") ?? [14, 17, 40],
     crisp: true,
     texFilter: "nearest",
     font: "alagard",

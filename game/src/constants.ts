@@ -21,6 +21,11 @@ export const leaderboardSettings = {
   itemsPerPage: 10,
 } as const;
 
+export const viewport = {
+  width: 960 * 2,
+  height: 540 * 2,
+} as const;
+
 export const gameSettings = {
   playerStartX: 80,
   playerFallSpeed: 3,
