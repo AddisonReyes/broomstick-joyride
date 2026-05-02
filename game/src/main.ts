@@ -1,5 +1,6 @@
 import kaplay from "kaplay";
 import "kaplay/global";
+import { loadGameAudio } from "./audio.js";
 import gameScene from "./scenes/game.js";
 import leaderboardScene from "./scenes/leaderboard.js";
 import loseScene from "./scenes/lose.js";
@@ -39,6 +40,7 @@ function loadAssets(): void {
   loadRoot("./");
   loadSprite("player", "sprites/player.png");
   loadFont("alagard", "fonts/alagard.ttf", { filter: "nearest" });
+  loadGameAudio();
 }
 
 function registerScenes(): void {

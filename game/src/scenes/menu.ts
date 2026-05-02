@@ -12,7 +12,7 @@ export default function menuScene(): void {
     const palette = getArcanePalette();
 
     setCursor("default");
-    addArcaneNightBackdrop("Made by Dakotitah");
+    addArcaneNightBackdrop("v0.1.1\tMade by Dakotitah");
     addTitleBlock(palette);
 
     addArcaneButton(

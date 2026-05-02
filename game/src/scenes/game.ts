@@ -1,4 +1,10 @@
 import "kaplay/global";
+import {
+  pauseGameplayMusic,
+  playGameOverSound,
+  startGameplayMusic,
+  stopGameplayMusic,
+} from "../audio.js";
 import { obstacleColors } from "../constants.js";
 import { getViewportScale, scaleUi } from "../layout.js";
 import type { PlayerSceneData } from "../types.js";
@@ -29,12 +35,15 @@ export default function gameScene(): void {
     const palette = getArcanePalette();
     const viewportScale = getViewportScale();
     const scaledSettings = getScaledGameSettings(viewportScale);
+    const activeTouchIds = new Set<number>();
     let currentWorldSpeed = scaledSettings.initialWorldSpeed;
+    let runHasEnded = false;
     let lastSingleBand: VerticalBand = "center";
     let paused = false;
     let score = 0;
 
     addArcaneNightBackdrop();
+    startGameplayMusic();
     const player = addPlayer(scaledSettings);
     const distanceLabel = addDistanceLabel(score, palette);
     const pauseOverlay = createPauseOverlay(
@@ -56,8 +65,14 @@ export default function gameScene(): void {
     scheduleNextWave();
 
     player.onUpdate(() => {
-      if (!paused) {
-        player.pos.y += scaledSettings.playerFallSpeed;
+      if (paused) {
+        return;
+      }
+
+      player.pos.y += scaledSettings.playerFallSpeed;
+
+      if (isLiftInputActive()) {
+        applyPlayerLift();
       }
     });
 
@@ -96,15 +111,42 @@ export default function gameScene(): void {
       distanceLabel.text = `${convertDistance(score)}m`;
     });
 
-    onKeyDown("space", () => {
-      if (!paused) {
-        player.pos.y -= scaledSettings.playerLiftSpeed;
-      }
+    onTouchStart((_position, touch) => {
+      activeTouchIds.add(touch.identifier);
+    });
+
+    onTouchEnd((_position, touch) => {
+      activeTouchIds.delete(touch.identifier);
     });
 
     onKeyPress("escape", togglePauseMenu);
 
+    onSceneLeave((nextScene) => {
+      if (!runHasEnded || nextScene !== "lose") {
+        stopGameplayMusic();
+      }
+    });
+
+    function isLiftInputActive(): boolean {
+      return isKeyDown("space") || activeTouchIds.size > 0;
+    }
+
+    function applyPlayerLift(): void {
+      if (paused) {
+        return;
+      }
+
+      player.pos.y -= scaledSettings.playerLiftSpeed;
+    }
+
     function endRun(): void {
+      if (runHasEnded) {
+        return;
+      }
+
+      runHasEnded = true;
+      pauseGameplayMusic();
+      playGameOverSound();
       go("lose", { username, score });
     }
 

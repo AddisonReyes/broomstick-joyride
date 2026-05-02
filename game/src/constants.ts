@@ -4,8 +4,13 @@ export const uiText = {
   leaderboardUnavailableTitle: "Leaderboard unavailable",
   leaderboardEmpty: "No leaderboard entries yet.",
   usernamePrompt: "Type your username",
-  usernameContinue: "Press 'Enter' to continue...",
+  usernameTapPrompt: "Tap the field to type your username",
+  usernameContinue: "Press 'Enter' or tap Continue",
   usernameIdle: ". . .",
+  usernameTouchFocused: "Type your username, then tap Continue",
+  usernameTouchIdle: "Tap the field to open the keyboard",
+  usernameTouchContinue: "Tap Continue to save your username",
+  usernameError: "Type a username to continue",
 } as const;
 
 export const obstacleColors = [

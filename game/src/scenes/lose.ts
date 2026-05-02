@@ -1,4 +1,5 @@
 import "kaplay/global";
+import { stopGameplayMusic } from "../audio.js";
 import { postEntry } from "../services/leaderboard.js";
 import { scaleUi } from "../layout.js";
 import type { LoseSceneData } from "../types.js";
@@ -15,6 +16,10 @@ export default function loseScene(): void {
     const palette = getArcanePalette();
 
     addArcaneNightBackdrop();
+    onSceneLeave(() => {
+      stopGameplayMusic();
+    });
+
     addArcanePanel(
       vec2(width() / 2, height() / 2 - scaleUi(12)),
       vec2(scaleUi(640), scaleUi(430)),

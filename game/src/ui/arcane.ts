@@ -1,4 +1,5 @@
 import "kaplay/global";
+import { playButtonClickSound } from "../audio.js";
 import { scaleUi } from "../layout.js";
 
 type ArcaneAction = () => void;
@@ -266,7 +267,10 @@ export function addArcaneButton(
     }
   });
 
-  button.onClick(onClick);
+  button.onClick(() => {
+    playButtonClickSound();
+    onClick();
+  });
 
   return button;
 }
